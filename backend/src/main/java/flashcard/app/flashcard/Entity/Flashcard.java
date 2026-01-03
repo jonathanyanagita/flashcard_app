@@ -21,12 +21,12 @@ public class Flashcard {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "The front of the card cannot be empty.")
     @Size(max = 1000)
     @Column(name = "front", length = 1000)
     private String front;
 
-    @NotBlank
+    @NotBlank(message = "The back (verse) of the card cannot be empty.")
     @Size(max = 1000)
     @Column(name = "verse", length = 1000)
     private String verse;

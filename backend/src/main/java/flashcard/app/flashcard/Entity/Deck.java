@@ -24,7 +24,7 @@ public class Deck {
 
     @NotBlank
     @Size(max = 15, min = 1)
-    @Column(name = "title", length = 15)
+    @Column(name = "title", length = 30)
     private String title;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
