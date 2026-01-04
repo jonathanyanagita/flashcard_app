@@ -8,10 +8,10 @@
         <version>3.5.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.brainboost</groupId>
-    <artifactId>brainboost</artifactId>
+    <groupId>com.flashcard_app</groupId>
+    <artifactId>flashcard_app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>brainboost</name>
+    <name>flashcard_app</name>
     <description>Flashcard App</description>
     <url/>
     <licenses>
