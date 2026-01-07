@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,7 +20,7 @@ public class Flashcard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    private Long id;
+    private UUID id;
 
     @NotBlank(message = "The front of the card cannot be empty.")
     @Size(max = 1000)
@@ -50,7 +51,7 @@ public class Flashcard {
 
     private LocalDate lastReviewDate = LocalDate.now();
 
-    public Flashcard(Long id, String front, String verse, String frontImage, String backImage){
+    public Flashcard(UUID id, String front, String verse, String frontImage, String backImage){
         this.id = id;
         this.front = front;
         this.verse = verse;
