@@ -21,4 +21,8 @@ public class UserService {
     public Optional<User> getUserById(UUID id){
         return userRepository.findById(id);
     }
+
+    public void deleteUser(User user){
+        userRepository.delete(user);
+    }
 }

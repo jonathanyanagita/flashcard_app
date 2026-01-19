@@ -34,7 +34,7 @@ public class UserController {
         return ResponseEntity.created(location).build();
     }
 
-    @GetMapping({"/{id}"})
+    @GetMapping("/{id}")
     public ResponseEntity<UserGetDto> getUserById(@PathVariable("id") String id) {
         var userId = UUID.fromString(id);
         Optional<User> userOptional = userService.getUserById(userId);
@@ -47,5 +47,19 @@ public class UserController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUserById(@PathVariable("id") String id){
+        var userId = UUID.fromString(id);
+        Optional<User> userOptional = userService.getUserById(userId);
+
+        if(userOptional.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        userService.deleteUser(userOptional.get());
+
+        return ResponseEntity.noContent().build();
     }
 }
