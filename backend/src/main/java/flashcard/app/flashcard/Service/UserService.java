@@ -18,6 +18,14 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public void updateUser(User user){
+        if (user.getId() == null){
+            throw new IllegalArgumentException("User id not found on database.");
+        }
+
+        userRepository.save(user);
+    }
+
     public Optional<User> getUserById(UUID id){
         return userRepository.findById(id);
     }

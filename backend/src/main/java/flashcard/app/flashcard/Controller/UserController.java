@@ -62,4 +62,22 @@ public class UserController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@Valid @PathVariable("id") String id, @RequestBody UserCreateDto dto) {
+        var userId = UUID.fromString(id);
+        Optional<User> userOptional = userService.getUserById(userId);
+
+            if(userOptional.isEmpty()){
+                return ResponseEntity.notFound().build();
+            }
+
+            var user = userOptional.get();
+            user.setEmail(dto.email());
+            user.setPassword(dto.password());
+
+            userService.updateUser(user);
+
+        return ResponseEntity.noContent().build();
+    }
 }
