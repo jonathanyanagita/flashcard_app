@@ -1,15 +1,16 @@
 package flashcard.app.flashcard.Controller;
 
-import flashcard.app.flashcard.Dto.DeckCreateDto;
 import flashcard.app.flashcard.Dto.UserCreateDto;
 import flashcard.app.flashcard.Dto.UserGetDto;
-import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Repository.UserRepository;
 import flashcard.app.flashcard.Service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -21,9 +22,27 @@ import java.util.UUID;
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
+    private final AuthenticationManager authenticationManager;
+
+    private final UserRepository userRepository;
+
+    public UserController(UserService userService, AuthenticationManager authenticationManager, UserRepository userRepository) {
+        this.userService = userService;
+        this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody UserCreateDto userCreateDto) {
+        try {
+            userService.registerUser(userCreateDto);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @PostMapping
     public ResponseEntity<Void> createUser(@Valid @RequestBody UserCreateDto dto) {
