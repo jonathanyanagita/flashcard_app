@@ -30,11 +30,11 @@ public class User implements UserDetails {
     private String email;
 
     @NotBlank
-    @Column(name = "password", length = 20)
+    @Column(name = "password", length = 255)
     private String password;
 
-    @Column(name = "active")
-    private boolean active = false;
+    //@Column(name = "active")
+    //private boolean active = false;
 
     @Column(name = "tokenRecPassword")
     private String tokenRecPassword;
@@ -91,6 +91,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return active;
+        return true;
     }
 }

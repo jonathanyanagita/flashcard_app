@@ -1,16 +1,16 @@
 package flashcard.app.flashcard.Controller;
 
+import flashcard.app.flashcard.Dto.LoginResponseDto;
 import flashcard.app.flashcard.Dto.UserCreateDto;
 import flashcard.app.flashcard.Dto.UserGetDto;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Repository.UserRepository;
+import flashcard.app.flashcard.Service.TokenService;
 import flashcard.app.flashcard.Service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -23,15 +23,23 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-
     private final AuthenticationManager authenticationManager;
+    private final TokenService tokenService;
 
-    private final UserRepository userRepository;
-
-    public UserController(UserService userService, AuthenticationManager authenticationManager, UserRepository userRepository) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager, UserRepository userRepository, TokenService tokenService) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
+        this.tokenService = tokenService;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody UserCreateDto userCreateDto){
+        var usernamepassword = new UsernamePasswordAuthenticationToken(userCreateDto.email(), userCreateDto.password());
+        var auth = this.authenticationManager.authenticate(usernamepassword);
+
+        var token = tokenService.generateToken((User) auth.getPrincipal());
+
+        return ResponseEntity.ok(new LoginResponseDto(token));
     }
 
     @PostMapping("/register")
