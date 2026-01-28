@@ -1,6 +1,5 @@
 package flashcard.app.flashcard.Dto;
 
-import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.User;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
@@ -14,7 +13,7 @@ public record UserCreateDto(
         String email,
 
         @NotBlank
-        @Column(name = "password", length = 20)
+        @Column(name = "password", length = 255)
         String password
 
 ) {
