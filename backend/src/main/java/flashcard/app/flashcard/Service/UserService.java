@@ -67,6 +67,18 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public Optional<User> confirmEmail(String token){
+        User user = userRepository.findByTokenConfirmation(token);
+
+        if (user == null) {
+            throw new RuntimeException("Invalid or expired token.");
+        }
+
+        user.setActive(true);
+        user.setTokenConfirmation(null);
+        return Optional.of(userRepository.save(user));
+    }
+
     public void deleteUser(User user){
         userRepository.delete(user);
     }

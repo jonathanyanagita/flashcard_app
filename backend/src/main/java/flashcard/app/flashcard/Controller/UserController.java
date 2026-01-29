@@ -1,5 +1,6 @@
 package flashcard.app.flashcard.Controller;
 
+import flashcard.app.flashcard.Dto.EmailConfirmationDto;
 import flashcard.app.flashcard.Dto.LoginResponseDto;
 import flashcard.app.flashcard.Dto.UserCreateDto;
 import flashcard.app.flashcard.Dto.UserGetDto;
@@ -8,6 +9,7 @@ import flashcard.app.flashcard.Repository.UserRepository;
 import flashcard.app.flashcard.Service.TokenService;
 import flashcard.app.flashcard.Service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -49,6 +51,16 @@ public class UserController {
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/register/confirm")
+    public ResponseEntity<?> confirmEmail(@RequestParam String token) {
+        try {
+            userService.confirmEmail(token);
+            return ResponseEntity.ok("E-mail confirmed!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 

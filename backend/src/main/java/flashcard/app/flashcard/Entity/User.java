@@ -2,7 +2,9 @@ package flashcard.app.flashcard.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,11 +32,11 @@ public class User implements UserDetails {
     private String email;
 
     @NotBlank
-    @Column(name = "password", length = 255)
+    @Column(name = "password")
     private String password;
 
-    //@Column(name = "active")
-    //private boolean active = false;
+    @Column(name = "active")
+    private boolean active = false;
 
     @Column(name = "tokenRecPassword")
     private String tokenRecPassword;
@@ -91,6 +93,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return active;
     }
 }

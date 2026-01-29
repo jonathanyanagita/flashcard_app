@@ -11,4 +11,7 @@ import java.util.UUID;
 public interface UserRepository extends JpaRepository<User, UUID> {
 
     UserDetails findByEmail(String email);
+
+    User findByTokenConfirmation(String tokenConfirmation);
+
 }
