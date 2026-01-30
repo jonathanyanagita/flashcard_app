@@ -46,12 +46,8 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserCreateDto userCreateDto) {
-        try {
             userService.registerUser(userCreateDto);
             return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
     }
 
     @PutMapping("/register/confirm")

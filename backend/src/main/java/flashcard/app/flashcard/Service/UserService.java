@@ -3,6 +3,7 @@ package flashcard.app.flashcard.Service;
 import flashcard.app.flashcard.Dto.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Repository.UserRepository;
+import flashcard.app.flashcard.Validator.UserValidator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,11 +21,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final UserValidator userValidator;
 
-    public UserService(UserRepository userRepository,  PasswordEncoder passwordEncoder, EmailService emailService) {
+    public UserService(UserRepository userRepository,  PasswordEncoder passwordEncoder, EmailService emailService, UserValidator userValidator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.userValidator = userValidator;
     }
 
     public User saveUser(User user){
@@ -40,10 +43,11 @@ public class UserService {
     }
 
     public void registerUser(UserCreateDto userCreateDto) {
-        if (userRepository.findByEmail(userCreateDto.email()) != null) {throw new RuntimeException("User already exists.");}
 
         String encryptedPassword = passwordEncoder.encode(userCreateDto.password());
         User newUser = new User(userCreateDto.email(), encryptedPassword);
+
+        userValidator.validate(newUser);
 
         SecureRandom random = new SecureRandom();
         String token = String.format("%06d", random.nextInt(1000000));
@@ -60,7 +64,6 @@ public class UserService {
             throw new RuntimeException("Error sending confirmation email.");
         }
 
-        userRepository.save(newUser);
     }
 
     public Optional<User> getUserById(UUID id){
