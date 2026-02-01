@@ -2,10 +2,9 @@ package flashcard.app.flashcard.Validator;
 
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.DuplicateException;
+import flashcard.app.flashcard.Exception.WrongTokenException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 @Component
 public class UserValidator {
@@ -16,13 +15,10 @@ public class UserValidator {
         this.userRepository = userRepository;
     }
 
-    public void validate(User user){
-        if(userAlreadyExists(user)){
-            throw new DuplicateException("User with this email already exists");
-        }
+    public void checkDuplicateEmail(User user) {
+        userRepository.findOptionalByEmail(user.getEmail())
+                .ifPresent(existingUser -> {throw new DuplicateException("User with this email already exists.");});
     }
 
-    private boolean userAlreadyExists(User user){
-        return userRepository.findOptionalByEmail(user.getEmail()).isPresent();
-    }
+
 }

@@ -47,7 +47,7 @@ public class UserService {
         String encryptedPassword = passwordEncoder.encode(userCreateDto.password());
         User newUser = new User(userCreateDto.email(), encryptedPassword);
 
-        userValidator.validate(newUser);
+        userValidator.checkDuplicateEmail(newUser);
 
         SecureRandom random = new SecureRandom();
         String token = String.format("%06d", random.nextInt(1000000));
