@@ -2,8 +2,11 @@ package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Dto.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
+import flashcard.app.flashcard.Exception.DuplicateException;
+import flashcard.app.flashcard.Exception.WrongTokenException;
 import flashcard.app.flashcard.Repository.UserRepository;
-import flashcard.app.flashcard.Validator.UserValidator;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,13 +24,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
-    private final UserValidator userValidator;
 
-    public UserService(UserRepository userRepository,  PasswordEncoder passwordEncoder, EmailService emailService, UserValidator userValidator) {
+    public UserService(UserRepository userRepository,  PasswordEncoder passwordEncoder, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
-        this.userValidator = userValidator;
     }
 
     public User saveUser(User user){
@@ -42,12 +43,15 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void registerUser(UserCreateDto userCreateDto) {
 
         String encryptedPassword = passwordEncoder.encode(userCreateDto.password());
         User newUser = new User(userCreateDto.email(), encryptedPassword);
 
-        userValidator.checkDuplicateEmail(newUser);
+        if (userRepository.existsByEmail(userCreateDto.email())) {
+            throw new DuplicateException("User with this email already exists.");
+        }
 
         SecureRandom random = new SecureRandom();
         String token = String.format("%06d", random.nextInt(1000000));
@@ -59,7 +63,7 @@ public class UserService {
                     "Hello,\n \n" +
                             "Thanks for creating an account with us! \n " +
                             "To complete your registration, please confirm your email address using the token below:\n \n " +
-                            "Confirmation Token:\n " + token);
+                            "Confirmation Token: \n" + token);
         } catch (Exception e) {
             throw new RuntimeException("Error sending confirmation email.");
         }
@@ -71,10 +75,12 @@ public class UserService {
     }
 
     public Optional<User> confirmEmail(String token){
+
         User user = userRepository.findByTokenConfirmation(token);
 
+
         if (user == null) {
-            throw new RuntimeException("Invalid or expired token.");
+            throw new WrongTokenException("Invalid or expired token.");
         }
 
         user.setActive(true);
@@ -85,4 +91,6 @@ public class UserService {
     public void deleteUser(User user){
         userRepository.delete(user);
     }
+
+
 }

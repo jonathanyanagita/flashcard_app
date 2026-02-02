@@ -6,6 +6,9 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -23,23 +26,38 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(error -> new ErrorMessageDto(HttpStatus.BAD_REQUEST.value(), error.getDefaultMessage()))
                 .collect(Collectors.toList());
-
-        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(),"Validation Failed",errors
-        );
-
+        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(),"Validation Failed",errors);
         return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(DuplicateException.class)
     public ResponseEntity<ErrorResponseDto> handleDuplicateUser(DuplicateException ex) {
         ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-
-        List<ErrorMessageDto> errors = List.of(errorDetail);
-
-        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), "Conflict Error",errors
-        );
-
+        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), "Conflict Error",List.of(errorDetail));
         return ResponseEntity.badRequest().body(response);
     }
+
+    @ExceptionHandler(WrongTokenException.class)
+    public ResponseEntity<ErrorResponseDto> handleWrongToken(WrongTokenException ex) {
+        ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(),"Token Error",List.of(errorDetail));
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponseDto> handleBadCredentials(BadCredentialsException ex) {
+        ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.UNAUTHORIZED.value(), "Invalid email or password.");
+        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.UNAUTHORIZED.value(),"Authentication Error",List.of(errorDetail));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponseDto> handleDisabledAccount(DisabledException ex) {
+        ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.FORBIDDEN.value(), "User account is disabled. Please confirm email.");
+        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.FORBIDDEN.value(),"Access Denied", List.of(errorDetail));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+
 
 }

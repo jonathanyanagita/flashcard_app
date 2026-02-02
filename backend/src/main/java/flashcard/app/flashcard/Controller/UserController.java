@@ -52,12 +52,8 @@ public class UserController {
 
     @PutMapping("/register/confirm")
     public ResponseEntity<?> confirmEmail(@RequestParam String token) {
-        try {
             userService.confirmEmail(token);
             return ResponseEntity.ok("E-mail confirmed!");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
     }
 
     @PostMapping
