@@ -1,15 +1,14 @@
 package flashcard.app.flashcard.Controller;
 
-import flashcard.app.flashcard.Dto.EmailConfirmationDto;
 import flashcard.app.flashcard.Dto.LoginResponseDto;
 import flashcard.app.flashcard.Dto.UserCreateDto;
 import flashcard.app.flashcard.Dto.UserGetDto;
 import flashcard.app.flashcard.Entity.User;
+import flashcard.app.flashcard.Mapper.UserMapper;
 import flashcard.app.flashcard.Repository.UserRepository;
 import flashcard.app.flashcard.Service.TokenService;
 import flashcard.app.flashcard.Service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,11 +26,13 @@ public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final UserMapper userMapper;
 
-    public UserController(UserService userService, AuthenticationManager authenticationManager, UserRepository userRepository, TokenService tokenService) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager, UserRepository userRepository, TokenService tokenService, UserMapper userMapper) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.tokenService = tokenService;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/login")
@@ -58,7 +59,7 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<Void> createUser(@Valid @RequestBody UserCreateDto dto) {
-        User user = dto.newUserMapper();
+        User user = userMapper.toEntity(dto);
         userService.saveUser(user);
         // URI uri = http://localhost:8080/decks/{id}
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri();
@@ -69,15 +70,14 @@ public class UserController {
     public ResponseEntity<UserGetDto> getUserById(@PathVariable("id") String id) {
         var userId = UUID.fromString(id);
         Optional<User> userOptional = userService.getUserById(userId);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            UserGetDto dto = new UserGetDto(
-                    user.getId(),user.getEmail(),user.getPassword()
-            );
-            return ResponseEntity.ok(dto);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+
+        return userService
+                .getUserById(userId)
+                .map(user -> {
+                    UserGetDto userGetDto = userMapper.toUserGetDto(user);
+                    return ResponseEntity.ok(userGetDto);
+        }).orElseGet ( () -> ResponseEntity.notFound().build());
+
     }
 
     @DeleteMapping("/{id}")
