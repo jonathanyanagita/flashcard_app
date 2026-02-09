@@ -1,5 +1,7 @@
 package flashcard.app.flashcard.Service;
 
+import flashcard.app.flashcard.Configuration.EmailMessages;
+import flashcard.app.flashcard.Dto.EmailContentDto;
 import flashcard.app.flashcard.Dto.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.DuplicateException;
@@ -7,14 +9,12 @@ import flashcard.app.flashcard.Exception.WrongTokenException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.util.Map;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,11 +24,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final TokenService tokenService;
 
-    public UserService(UserRepository userRepository,  PasswordEncoder passwordEncoder, EmailService emailService) {
+    public UserService(UserRepository userRepository,  PasswordEncoder passwordEncoder, EmailService emailService, TokenService tokenService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
+        this.tokenService = tokenService;
     }
 
     public User saveUser(User user){
@@ -56,16 +58,12 @@ public class UserService {
         SecureRandom random = new SecureRandom();
         String token = String.format("%06d", random.nextInt(1000000));
         newUser.setTokenConfirmation(token);
-        userRepository.save(newUser);
 
+        EmailContentDto content = EmailMessages.registration(token);
         try {
-            emailService.sendEmail(newUser.getEmail(), "Confirm your email address!",
-                    "Hello,\n \n" +
-                            "Thanks for creating an account with us! \n " +
-                            "To complete your registration, please confirm your email address using the token below:\n \n " +
-                            "Confirmation Token: \n" + token);
+            emailService.sendEmail(userCreateDto.email(), content.subject(), content.body());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending confirmation email.");
+            throw new RuntimeException("Error sending email.");
         }
 
     }
@@ -93,4 +91,28 @@ public class UserService {
     }
 
 
+    @Transactional
+    public void forgotPassword(@Valid String email) {
+
+        UserDetails userDetails = userRepository.findByEmail(email);
+
+        if(userDetails == null){
+            throw new RuntimeException("Email not found.");
+        }
+
+        User user = (User) userDetails;
+
+        SecureRandom random = new SecureRandom();
+        String token = String.format("%06d", random.nextInt(1000000));
+        user.setTokenRecPasswordValidity(LocalDateTime.now().plusHours(3));
+        user.setTokenRecPassword(token);
+
+        EmailContentDto content = EmailMessages.forgotPassword(token);
+        try {
+            emailService.sendEmail(email, content.subject(), content.body());
+        } catch (Exception e) {
+            throw new RuntimeException("Error sending email.");
+        }
+
+        }
 }

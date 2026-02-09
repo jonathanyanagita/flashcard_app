@@ -57,6 +57,14 @@ public class UserController {
             return ResponseEntity.ok("E-mail confirmed!");
     }
 
+    @PutMapping("/forgot")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestParam String email) {
+
+        userService.forgotPassword(email);
+        return ResponseEntity.ok("Check your email!");
+
+    }
+
     @PostMapping
     public ResponseEntity<Void> createUser(@Valid @RequestBody UserCreateDto dto) {
         User user = userMapper.toEntity(dto);
