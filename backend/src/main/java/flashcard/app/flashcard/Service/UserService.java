@@ -5,6 +5,7 @@ import flashcard.app.flashcard.Dto.EmailContentDto;
 import flashcard.app.flashcard.Dto.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.DuplicateException;
+import flashcard.app.flashcard.Exception.EmailNotFoundException;
 import flashcard.app.flashcard.Exception.WrongTokenException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -97,7 +98,7 @@ public class UserService {
         UserDetails userDetails = userRepository.findByEmail(email);
 
         if(userDetails == null){
-            throw new RuntimeException("Email not found.");
+            throw new EmailNotFoundException("Email not found.");
         }
 
         User user = (User) userDetails;
@@ -113,6 +114,21 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException("Error sending email.");
         }
+    }
 
+    @Transactional
+    public void newPassword(String token, String password) {
+
+        User user = userRepository.findBytokenRecPassword(token);
+
+        if(user == null){
+            throw new WrongTokenException("Wrong or expired token.");
         }
+
+        String encryptedPassword = passwordEncoder.encode(password);
+        user.setPassword(encryptedPassword);
+        user.setTokenRecPassword(null);
+        user.setTokenRecPasswordValidity(null);
+
+    }
 }

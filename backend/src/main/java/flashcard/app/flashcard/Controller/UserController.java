@@ -1,6 +1,7 @@
 package flashcard.app.flashcard.Controller;
 
 import flashcard.app.flashcard.Dto.LoginResponseDto;
+import flashcard.app.flashcard.Dto.NewPasswordDto;
 import flashcard.app.flashcard.Dto.UserCreateDto;
 import flashcard.app.flashcard.Dto.UserGetDto;
 import flashcard.app.flashcard.Entity.User;
@@ -62,6 +63,14 @@ public class UserController {
 
         userService.forgotPassword(email);
         return ResponseEntity.ok("Check your email!");
+
+    }
+
+    @PutMapping("/newpassword")
+    public ResponseEntity<?> newPassword(@Valid @RequestBody NewPasswordDto  newPasswordDto) {
+
+        userService.newPassword(newPasswordDto.token(),newPasswordDto.password());
+        return ResponseEntity.ok("New Password!");
 
     }
 

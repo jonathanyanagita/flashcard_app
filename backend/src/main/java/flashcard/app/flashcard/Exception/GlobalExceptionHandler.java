@@ -2,13 +2,10 @@ package flashcard.app.flashcard.Exception;
 
 import flashcard.app.flashcard.Dto.ErrorMessageDto;
 import flashcard.app.flashcard.Dto.ErrorResponseDto;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -56,6 +53,13 @@ public class GlobalExceptionHandler {
         ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.FORBIDDEN.value(), "User account is disabled. Please confirm email.");
         ErrorResponseDto response = new ErrorResponseDto(HttpStatus.FORBIDDEN.value(),"Access Denied", List.of(errorDetail));
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleEmailNotFound(EmailNotFoundException ex) {
+        ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.NOT_FOUND.value(),"Authentication Error", List.of(errorDetail));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
 

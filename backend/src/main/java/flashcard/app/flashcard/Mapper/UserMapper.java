@@ -13,9 +13,6 @@ public interface UserMapper {
     @Mapping(source = "password", target = "password")
     User toEntity(UserCreateDto userCreateDto);
 
-    UserCreateDto toUserCreateDto(User toUser);
-
     UserGetDto toUserGetDto(User toUser);
-
 
 }
