@@ -1,9 +1,6 @@
 package flashcard.app.flashcard.Controller;
 
-import flashcard.app.flashcard.Dto.LoginResponseDto;
-import flashcard.app.flashcard.Dto.NewPasswordDto;
-import flashcard.app.flashcard.Dto.UserCreateDto;
-import flashcard.app.flashcard.Dto.UserGetDto;
+import flashcard.app.flashcard.Dto.*;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Mapper.UserMapper;
 import flashcard.app.flashcard.Repository.UserRepository;
@@ -50,6 +47,14 @@ public class UserController {
     public ResponseEntity<?> register(@Valid @RequestBody UserCreateDto userCreateDto) {
             userService.registerUser(userCreateDto);
             return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/register/resend")
+    public ResponseEntity<?> resendEmail(@RequestBody ResendEmailDto resendEmailDto){
+
+        userService.resendEmail(resendEmailDto);
+        return ResponseEntity.ok().build();
+
     }
 
     @PutMapping("/register/confirm")

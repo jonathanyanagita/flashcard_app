@@ -2,6 +2,7 @@ package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Configuration.EmailMessages;
 import flashcard.app.flashcard.Dto.EmailContentDto;
+import flashcard.app.flashcard.Dto.ResendEmailDto;
 import flashcard.app.flashcard.Dto.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.DuplicateException;
@@ -10,6 +11,8 @@ import flashcard.app.flashcard.Exception.WrongTokenException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -67,6 +70,31 @@ public class UserService {
             throw new RuntimeException("Error sending email.");
         }
 
+        userRepository.save(newUser);
+
+    }
+
+    @Transactional
+    public void resendEmail(ResendEmailDto resendEmailDto) {
+
+        UserDetails userDetails = userRepository.findByEmail(resendEmailDto.email());
+
+        if (userDetails == null) {
+            throw  new EmailNotFoundException("Email not found on database.");
+        }
+
+        User user = (User) userDetails;
+
+        SecureRandom random = new SecureRandom();
+        String token = String.format("%06d", random.nextInt(1000000));
+        user.setTokenConfirmation(token);
+
+        EmailContentDto content = EmailMessages.registration(token);
+        try {
+            emailService.sendEmail(user.getEmail(), content.subject(), content.body());
+        } catch (Exception e) {
+            throw new RuntimeException("Error sending email.");
+        }
     }
 
     public Optional<User> getUserById(UUID id){
@@ -114,6 +142,7 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException("Error sending email.");
         }
+
     }
 
     @Transactional
@@ -129,6 +158,6 @@ public class UserService {
         user.setPassword(encryptedPassword);
         user.setTokenRecPassword(null);
         user.setTokenRecPasswordValidity(null);
-
     }
+
 }
