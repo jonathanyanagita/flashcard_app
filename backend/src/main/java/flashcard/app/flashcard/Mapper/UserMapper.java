@@ -1,7 +1,7 @@
 package flashcard.app.flashcard.Mapper;
 
-import flashcard.app.flashcard.Dto.UserCreateDto;
-import flashcard.app.flashcard.Dto.UserGetDto;
+import flashcard.app.flashcard.Dto.UserDtos.UserCreateDto;
+import flashcard.app.flashcard.Dto.UserDtos.UserGetDto;
 import flashcard.app.flashcard.Entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

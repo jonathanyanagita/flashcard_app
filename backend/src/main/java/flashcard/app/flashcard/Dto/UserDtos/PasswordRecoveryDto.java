@@ -1,4 +1,4 @@
-package flashcard.app.flashcard.Dto;
+package flashcard.app.flashcard.Dto.UserDtos;
 
 public record PasswordRecoveryDto (
 

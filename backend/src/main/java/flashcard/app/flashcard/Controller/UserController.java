@@ -1,6 +1,6 @@
 package flashcard.app.flashcard.Controller;
 
-import flashcard.app.flashcard.Dto.*;
+import flashcard.app.flashcard.Dto.UserDtos.*;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Mapper.UserMapper;
 import flashcard.app.flashcard.Repository.UserRepository;
@@ -11,9 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,16 +31,6 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody UserCreateDto userCreateDto){
-        var usernamepassword = new UsernamePasswordAuthenticationToken(userCreateDto.email(), userCreateDto.password());
-        var auth = this.authenticationManager.authenticate(usernamepassword);
-
-        var token = tokenService.generateToken((User) auth.getPrincipal());
-
-        return ResponseEntity.ok(new LoginResponseDto(token));
-    }
-
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserCreateDto userCreateDto) {
             userService.registerUser(userCreateDto);
@@ -51,10 +39,8 @@ public class UserController {
 
     @PutMapping("/register/resend")
     public ResponseEntity<?> resendEmail(@RequestBody ResendEmailDto resendEmailDto){
-
         userService.resendEmail(resendEmailDto);
         return ResponseEntity.ok().build();
-
     }
 
     @PutMapping("/register/confirm")
@@ -63,29 +49,24 @@ public class UserController {
             return ResponseEntity.ok("E-mail confirmed!");
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequestDto){
+        var usernamepassword = new UsernamePasswordAuthenticationToken(loginRequestDto.email(), loginRequestDto.password());
+        var auth = this.authenticationManager.authenticate(usernamepassword);
+        var token = tokenService.generateToken((User) auth.getPrincipal());
+        return ResponseEntity.ok(new LoginResponseDto(token));
+    }
+
     @PutMapping("/forgot")
     public ResponseEntity<?> forgotPassword(@Valid @RequestParam String email) {
-
         userService.forgotPassword(email);
         return ResponseEntity.ok("Check your email!");
-
     }
 
     @PutMapping("/newpassword")
-    public ResponseEntity<?> newPassword(@Valid @RequestBody NewPasswordDto  newPasswordDto) {
-
+    public ResponseEntity<?> newPassword(@Valid @RequestBody NewPasswordDto newPasswordDto) {
         userService.newPassword(newPasswordDto.token(),newPasswordDto.password());
         return ResponseEntity.ok("New Password!");
-
-    }
-
-    @PostMapping
-    public ResponseEntity<Void> createUser(@Valid @RequestBody UserCreateDto dto) {
-        User user = userMapper.toEntity(dto);
-        userService.saveUser(user);
-        // URI uri = http://localhost:8080/decks/{id}
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri();
-        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/{id}")
@@ -112,25 +93,6 @@ public class UserController {
         }
 
         userService.deleteUser(userOptional.get());
-
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@Valid @PathVariable("id") String id, @RequestBody UserCreateDto dto) {
-        var userId = UUID.fromString(id);
-        Optional<User> userOptional = userService.getUserById(userId);
-
-            if(userOptional.isEmpty()){
-                return ResponseEntity.notFound().build();
-            }
-
-            var user = userOptional.get();
-            user.setEmail(dto.email());
-            user.setPassword(dto.password());
-
-            userService.updateUser(user);
-
         return ResponseEntity.noContent().build();
     }
 }

@@ -2,8 +2,8 @@ package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Configuration.EmailMessages;
 import flashcard.app.flashcard.Dto.EmailContentDto;
-import flashcard.app.flashcard.Dto.ResendEmailDto;
-import flashcard.app.flashcard.Dto.UserCreateDto;
+import flashcard.app.flashcard.Dto.UserDtos.ResendEmailDto;
+import flashcard.app.flashcard.Dto.UserDtos.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.DuplicateException;
 import flashcard.app.flashcard.Exception.EmailNotFoundException;
@@ -11,8 +11,6 @@ import flashcard.app.flashcard.Exception.WrongTokenException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,14 +37,6 @@ public class UserService {
 
     public User saveUser(User user){
         return userRepository.save(user);
-    }
-
-    public void updateUser(User user){
-        if (user.getId() == null){
-            throw new IllegalArgumentException("User id not found on database.");
-        }
-
-        userRepository.save(user);
     }
 
     @Transactional
