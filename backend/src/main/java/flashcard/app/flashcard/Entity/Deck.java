@@ -24,7 +24,7 @@ public class Deck {
     private UUID id;
 
     @NotBlank
-    @Size(max = 15, min = 1)
+    @Size(max = 30, min = 1)
     @Column(name = "title", length = 30)
     private String title;
 
@@ -35,8 +35,4 @@ public class Deck {
     @OneToMany(mappedBy = "deck", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Flashcard> flashcards = new HashSet<>();
 
-    public Deck(UUID id, String title, String description){
-        this.id = id;
-        this.title = title;
-    }
 }

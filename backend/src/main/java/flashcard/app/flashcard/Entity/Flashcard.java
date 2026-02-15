@@ -55,12 +55,5 @@ public class Flashcard {
 
     private LocalDate lastReviewDate = LocalDate.now();
 
-    public Flashcard(UUID id, String front, String verse, String frontImage, String backImage){
-        this.id = id;
-        this.front = front;
-        this.verse = verse;
-        this.frontImage = frontImage;
-        this.backImage = backImage;
-    }
 
 }
