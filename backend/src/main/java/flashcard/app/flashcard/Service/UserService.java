@@ -67,11 +67,8 @@ public class UserService {
     @Transactional
     public void resendEmail(ResendEmailDto resendEmailDto) {
 
-        UserDetails userDetails = userRepository.findByEmail(resendEmailDto.email());
-
-        if (userDetails == null) {
-            throw  new EmailNotFoundException("Email not found on database.");
-        }
+        UserDetails userDetails = userRepository.findByEmail(resendEmailDto.email())
+                .orElseThrow(()->new EmailNotFoundException("Email not found on database."));
 
         User user = (User) userDetails;
 
@@ -113,11 +110,8 @@ public class UserService {
     @Transactional
     public void forgotPassword(@Valid String email) {
 
-        UserDetails userDetails = userRepository.findByEmail(email);
-
-        if(userDetails == null){
-            throw new EmailNotFoundException("Email not found.");
-        }
+        UserDetails userDetails = userRepository.findByEmail(email)
+                .orElseThrow(()->new EmailNotFoundException("Email not found on database."));
 
         User user = (User) userDetails;
 

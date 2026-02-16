@@ -63,5 +63,11 @@ public class GlobalExceptionHandler {
     }
 
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleUserNotFound(DuplicateException ex) {
+        ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.NOT_FOUND.value(), "Not Found Error",List.of(errorDetail));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
 
 }

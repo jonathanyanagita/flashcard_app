@@ -1,5 +1,6 @@
 package flashcard.app.flashcard.Configuration;
 
+import flashcard.app.flashcard.Exception.EmailNotFoundException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -30,7 +31,8 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = this.recoverToken(request);
         if(token != null){
             var login = tokenService.validateToken(token);
-            UserDetails user = userRepository.findByEmail(login);
+            UserDetails user = userRepository.findByEmail(login)
+                    .orElseThrow(()-> new EmailNotFoundException("Email not found on database."));
 
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
