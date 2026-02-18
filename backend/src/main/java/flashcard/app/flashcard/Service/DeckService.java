@@ -1,6 +1,7 @@
 package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Dto.DeckDtos.DeckCreateDto;
+import flashcard.app.flashcard.Dto.DeckDtos.DeckListDto;
 import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.UserNotFoundException;
@@ -10,11 +11,14 @@ import flashcard.app.flashcard.Repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 public class DeckService {
 
     private final DeckRepository deckRepository;
-    private final DeckMapper  deckMapper;
+    private final DeckMapper deckMapper;
     private final UserRepository userRepository;
 
     public DeckService(DeckRepository deckRepository,  DeckMapper deckMapper,  UserRepository userRepository) {
@@ -34,4 +38,7 @@ public class DeckService {
 
     }
 
+    public List<DeckListDto> listDecks(UUID id) {
+        return deckRepository.deckList(id);
+    }
 }

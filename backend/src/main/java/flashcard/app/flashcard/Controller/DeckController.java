@@ -2,12 +2,14 @@ package flashcard.app.flashcard.Controller;
 
 
 import flashcard.app.flashcard.Dto.DeckDtos.DeckCreateDto;
+import flashcard.app.flashcard.Dto.DeckDtos.DeckListDto;
+import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Service.DeckService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/decks")
@@ -23,6 +25,12 @@ public class DeckController {
     public ResponseEntity<?>  addDeck(@RequestBody DeckCreateDto deckCreateDto) {
         deckService.addDeck(deckCreateDto);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/list/{id}")
+    public ResponseEntity<List<DeckListDto>>  listDecks(@PathVariable UUID id) {
+        List<DeckListDto> decks = deckService.listDecks(id);
+        return ResponseEntity.ok(decks);
     }
 
 }
