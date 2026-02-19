@@ -6,7 +6,7 @@ import flashcard.app.flashcard.Dto.UserDtos.ResendEmailDto;
 import flashcard.app.flashcard.Dto.UserDtos.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.DuplicateException;
-import flashcard.app.flashcard.Exception.EmailNotFoundException;
+import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Exception.WrongTokenException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -68,7 +68,7 @@ public class UserService {
     public void resendEmail(ResendEmailDto resendEmailDto) {
 
         UserDetails userDetails = userRepository.findByEmail(resendEmailDto.email())
-                .orElseThrow(()->new EmailNotFoundException("Email not found on database."));
+                .orElseThrow(()->new NotFoundException("Email not found on database."));
 
         User user = (User) userDetails;
 
@@ -111,7 +111,7 @@ public class UserService {
     public void forgotPassword(@Valid String email) {
 
         UserDetails userDetails = userRepository.findByEmail(email)
-                .orElseThrow(()->new EmailNotFoundException("Email not found on database."));
+                .orElseThrow(()->new NotFoundException("Email not found on database."));
 
         User user = (User) userDetails;
 

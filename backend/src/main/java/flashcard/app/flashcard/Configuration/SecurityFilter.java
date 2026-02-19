@@ -1,7 +1,8 @@
 package flashcard.app.flashcard.Configuration;
 
-import flashcard.app.flashcard.Exception.EmailNotFoundException;
+import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Repository.UserRepository;
+import flashcard.app.flashcard.Service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +12,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import flashcard.app.flashcard.Service.TokenService;
 
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         if(token != null){
             var login = tokenService.validateToken(token);
             UserDetails user = userRepository.findByEmail(login)
-                    .orElseThrow(()-> new EmailNotFoundException("Email not found on database."));
+                    .orElseThrow(()-> new NotFoundException("Email not found on database."));
 
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
