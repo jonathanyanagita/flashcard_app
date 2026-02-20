@@ -3,7 +3,6 @@ package flashcard.app.flashcard.Controller;
 
 import flashcard.app.flashcard.Dto.DeckDtos.DeckCreateDto;
 import flashcard.app.flashcard.Dto.DeckDtos.DeckListDto;
-import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Service.DeckService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +30,12 @@ public class DeckController {
     public ResponseEntity<List<DeckListDto>>  listDecks(@PathVariable UUID id) {
         List<DeckListDto> decks = deckService.listDecks(id);
         return ResponseEntity.ok(decks);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteDeck(@PathVariable UUID id) {
+        deckService.deleteDeck(id);
+        return ResponseEntity.notFound().build();
     }
 
 }

@@ -4,7 +4,7 @@ import flashcard.app.flashcard.Dto.DeckDtos.DeckCreateDto;
 import flashcard.app.flashcard.Dto.DeckDtos.DeckListDto;
 import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.User;
-import flashcard.app.flashcard.Exception.UserNotFoundException;
+import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Mapper.DeckMapper;
 import flashcard.app.flashcard.Repository.DeckRepository;
 import flashcard.app.flashcard.Repository.UserRepository;
@@ -30,7 +30,7 @@ public class DeckService {
     public void addDeck(@Valid DeckCreateDto deckCreateDto){
 
         User user = userRepository.findById(deckCreateDto.userId())
-                .orElseThrow(() -> new UserNotFoundException("User not found."));
+                .orElseThrow(() -> new NotFoundException("User not found."));
 
         Deck deck = deckMapper.toEntity(deckCreateDto);
         deck.setUser(user);
@@ -41,4 +41,14 @@ public class DeckService {
     public List<DeckListDto> listDecks(UUID id) {
         return deckRepository.deckList(id);
     }
+
+    public void deleteDeck(UUID id) {
+
+        Deck deck = deckRepository.findById(id)
+                .orElseThrow(()-> new NotFoundException("Deck not found."));
+
+        deckRepository.delete(deck);
+
+    }
+
 }

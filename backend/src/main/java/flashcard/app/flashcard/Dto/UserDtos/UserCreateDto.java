@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 public record UserCreateDto(
 
         @NotBlank
-        @Email
+        @Email(message = "Email format not valid.")
         @Column(name = "email", nullable = false, unique = true)
         String email,
 
