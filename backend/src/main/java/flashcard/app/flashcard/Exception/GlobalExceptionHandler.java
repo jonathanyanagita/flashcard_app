@@ -11,10 +11,17 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private ResponseEntity<ErrorResponseDto> buildResponse(HttpStatus status, String title, String message) {
+        return buildResponse(status, title, List.of(new ErrorMessageDto(status.value(), message)));
+    }
+
+    private ResponseEntity<ErrorResponseDto> buildResponse(HttpStatus status, String title, List<ErrorMessageDto> errors) {
+        return ResponseEntity.status(status).body(new ErrorResponseDto(status.value(), title, errors));
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDto> handleValidationErrors(MethodArgumentNotValidException ex) {
@@ -22,44 +29,36 @@ public class GlobalExceptionHandler {
                 .getFieldErrors()
                 .stream()
                 .map(error -> new ErrorMessageDto(HttpStatus.BAD_REQUEST.value(), error.getDefaultMessage()))
-                .collect(Collectors.toList());
-        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(),"Validation Failed",errors);
-        return ResponseEntity.badRequest().body(response);
+                .toList();
+
+        return buildResponse(HttpStatus.BAD_REQUEST, "Validation Failed", errors);
     }
 
     @ExceptionHandler(DuplicateException.class)
-    public ResponseEntity<ErrorResponseDto> handleDuplicateUser(DuplicateException ex) {
-        ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(), "Conflict Error",List.of(errorDetail));
-        return ResponseEntity.badRequest().body(response);
+    public ResponseEntity<ErrorResponseDto> handleDuplicate(DuplicateException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Conflict Error", ex.getMessage());
     }
 
     @ExceptionHandler(WrongTokenException.class)
     public ResponseEntity<ErrorResponseDto> handleWrongToken(WrongTokenException ex) {
-        ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
-        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.BAD_REQUEST.value(),"Token Error",List.of(errorDetail));
-        return ResponseEntity.badRequest().body(response);
+        return buildResponse(HttpStatus.BAD_REQUEST, "Token Error", ex.getMessage());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponseDto> handleBadCredentials(BadCredentialsException ex) {
-        ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.UNAUTHORIZED.value(), "Invalid email or password.");
-        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.UNAUTHORIZED.value(),"Authentication Error",List.of(errorDetail));
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    public ResponseEntity<ErrorResponseDto> handleBadCredentials() {
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Authentication Error",
+                "Invalid email or password.");
     }
 
     @ExceptionHandler(DisabledException.class)
-    public ResponseEntity<ErrorResponseDto> handleDisabledAccount(DisabledException ex) {
-        ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.FORBIDDEN.value(), "User account is disabled. Please confirm email.");
-        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.FORBIDDEN.value(),"Access Denied", List.of(errorDetail));
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    public ResponseEntity<ErrorResponseDto> handleDisabledAccount() {
+        return buildResponse(HttpStatus.FORBIDDEN, "Access Denied",
+                "User account is disabled. Please confirm email.");
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorResponseDto> handleEmailNotFound(NotFoundException ex) {
-        ErrorMessageDto errorDetail = new ErrorMessageDto(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-        ErrorResponseDto response = new ErrorResponseDto(HttpStatus.NOT_FOUND.value(),"Not Found Error", List.of(errorDetail));
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    public ResponseEntity<ErrorResponseDto> handleNotFound(NotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "Not Found Error", ex.getMessage());
     }
 
 }
