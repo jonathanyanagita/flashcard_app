@@ -2,6 +2,7 @@ package flashcard.app.flashcard.Controller;
 
 
 import flashcard.app.flashcard.Dto.DeckDtos.DeckCreateDto;
+import flashcard.app.flashcard.Dto.DeckDtos.DeckEditDto;
 import flashcard.app.flashcard.Dto.DeckDtos.DeckListDto;
 import flashcard.app.flashcard.Service.DeckService;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,12 @@ public class DeckController {
     public ResponseEntity<?> deleteDeck(@PathVariable UUID id) {
         deckService.deleteDeck(id);
         return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<?> updateTitle(@PathVariable UUID id, @RequestBody DeckEditDto deckEditDto) {
+        deckService.editDeckTitle(id, deckEditDto);
+        return  ResponseEntity.ok().build();
     }
 
 }
