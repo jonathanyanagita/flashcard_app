@@ -1,7 +1,6 @@
 package flashcard.app.flashcard.Dto.FlashcardDtos;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record FlashcardCreateDto(
@@ -15,9 +14,6 @@ public record FlashcardCreateDto(
         String verse,
 
         String frontImage,
-        String backImage,
-
-        @NotNull(message = "A deck ID must be provided")
-        Long deckId
+        String backImage
 
 ) {}
