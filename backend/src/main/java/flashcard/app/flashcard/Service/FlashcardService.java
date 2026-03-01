@@ -37,5 +37,10 @@ public class FlashcardService {
     }
 
 
+    public void deleteFlashcard(UUID id) {
 
+        Flashcard flashcard = flashcardRepository.findById(id)
+                .orElseThrow(()-> new NotFoundException("Flashcard not found."));
+
+        flashcardRepository.delete(flashcard);    }
 }

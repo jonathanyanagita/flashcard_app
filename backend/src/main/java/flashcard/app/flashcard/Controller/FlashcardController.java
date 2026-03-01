@@ -22,4 +22,10 @@ public class FlashcardController {
         flashcardService.addFlashcard(id, flashcardCreateDto);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteFlashcard(@PathVariable UUID id) {
+        flashcardService.deleteFlashcard(id);
+        return ResponseEntity.notFound().build();
+    }
 }
