@@ -2,6 +2,7 @@ package flashcard.app.flashcard.Exception;
 
 import flashcard.app.flashcard.Dto.ErrorMessageDto;
 import flashcard.app.flashcard.Dto.ErrorResponseDto;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -59,6 +60,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleNotFound(NotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, "Not Found Error", ex.getMessage());
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponseDto> handleConstraintViolation(ConstraintViolationException ex) {
+        String errorMessage = ex.getConstraintViolations().stream()
+                .map(violation -> violation.getMessage())
+                .findFirst()
+                .orElse("Validation failed");
+
+        return buildResponse(HttpStatus.BAD_REQUEST,"Validation Error",errorMessage);
     }
 
 }

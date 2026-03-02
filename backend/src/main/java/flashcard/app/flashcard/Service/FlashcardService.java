@@ -1,6 +1,7 @@
 package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardCreateDto;
+import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardEditDto;
 import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.Flashcard;
 import flashcard.app.flashcard.Exception.NotFoundException;
@@ -24,7 +25,6 @@ public class FlashcardService {
         this.flashcardMapper = flashcardMapper;
     }
 
-
     public void addFlashcard(UUID id, FlashcardCreateDto flashcardCreateDto) {
 
         Deck deck = deckRepository.findById(id)
@@ -36,11 +36,19 @@ public class FlashcardService {
 
     }
 
-
     public void deleteFlashcard(UUID id) {
 
         Flashcard flashcard = flashcardRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Flashcard not found."));
 
         flashcardRepository.delete(flashcard);    }
+
+    public void editFlashcad(UUID id, FlashcardEditDto flashcardEditDto) {
+
+        Flashcard flashcard = flashcardRepository.findById(id)
+                .orElseThrow(()-> new NotFoundException("Flashcard not found."));
+
+        flashcardMapper.editFlashcard(flashcardEditDto, flashcard);
+        flashcardRepository.save(flashcard);
+    }
 }

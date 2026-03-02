@@ -1,6 +1,7 @@
 package flashcard.app.flashcard.Controller;
 
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardCreateDto;
+import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardEditDto;
 import flashcard.app.flashcard.Service.FlashcardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,5 +28,11 @@ public class FlashcardController {
     public ResponseEntity<?> deleteFlashcard(@PathVariable UUID id) {
         flashcardService.deleteFlashcard(id);
         return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/edit/{id}")
+    public ResponseEntity<?> editFlashcard(@PathVariable UUID id, @RequestBody FlashcardEditDto flashcardEditDto) {
+        flashcardService.editFlashcad(id, flashcardEditDto);
+        return ResponseEntity.ok().build();
     }
 }
