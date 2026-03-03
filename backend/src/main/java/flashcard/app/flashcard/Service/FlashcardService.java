@@ -2,6 +2,7 @@ package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardCreateDto;
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardEditDto;
+import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
 import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.Flashcard;
 import flashcard.app.flashcard.Exception.NotFoundException;
@@ -10,6 +11,8 @@ import flashcard.app.flashcard.Repository.DeckRepository;
 import flashcard.app.flashcard.Repository.FlashcardRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -50,5 +53,14 @@ public class FlashcardService {
 
         flashcardMapper.editFlashcard(flashcardEditDto, flashcard);
         flashcardRepository.save(flashcard);
+    }
+
+    public List<FlashcardResponseDto> getDueFlashcards(UUID deckId) {
+        List<Flashcard> dueCards = flashcardRepository
+                .findByDeckIdAndNextReviewDateLessThanEqual(deckId, LocalDate.now());
+
+        return dueCards.stream()
+                .map(flashcardMapper::toDto)
+                .toList();
     }
 }
