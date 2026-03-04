@@ -11,7 +11,6 @@ import flashcard.app.flashcard.Repository.DeckRepository;
 import flashcard.app.flashcard.Repository.FlashcardRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,12 +54,14 @@ public class FlashcardService {
         flashcardRepository.save(flashcard);
     }
 
-    public List<FlashcardResponseDto> getDueFlashcards(UUID deckId) {
-        List<Flashcard> dueCards = flashcardRepository
-                .findByDeckIdAndNextReviewDateLessThanEqual(deckId, LocalDate.now());
+    public List<FlashcardResponseDto> getFlashcards(UUID deckId) {
+        List<Flashcard> allFlashcards = flashcardRepository
+                .findByDeckId(deckId);
 
-        return dueCards.stream()
+        return allFlashcards.stream()
                 .map(flashcardMapper::toDto)
                 .toList();
     }
+
+
 }

@@ -41,8 +41,10 @@ public class FlashcardController {
     @GetMapping("/get/{id}")
     public ResponseEntity<List<FlashcardResponseDto>>  getAllFlashcards(@PathVariable UUID id) {
 
-        List<FlashcardResponseDto> dtos = flashcardService.getDueFlashcards(id);
+        List<FlashcardResponseDto> dtos = flashcardService.getFlashcards(id);
         return ResponseEntity.ok(dtos);
 
     }
+
+
 }
