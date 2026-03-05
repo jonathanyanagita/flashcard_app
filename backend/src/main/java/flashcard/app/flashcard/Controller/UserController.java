@@ -70,12 +70,11 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserGetDto> getUserById(@PathVariable("id") String id) {
-        var userId = UUID.fromString(id);
-        Optional<User> userOptional = userService.getUserById(userId);
+    public ResponseEntity<UserGetDto> getUserById(@PathVariable("id") UUID id) {
+        Optional<User> userOptional = userService.getUserById(id);
 
         return userService
-                .getUserById(userId)
+                .getUserById(id)
                 .map(user -> {
                     UserGetDto userGetDto = userMapper.toUserGetDto(user);
                     return ResponseEntity.ok(userGetDto);
@@ -84,9 +83,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable("id") String id){
-        var userId = UUID.fromString(id);
-        Optional<User> userOptional = userService.getUserById(userId);
+    public ResponseEntity<Void> deleteUserById(@PathVariable("id") UUID id){
+        Optional<User> userOptional = userService.getUserById(id);
 
         if(userOptional.isEmpty()){
             return ResponseEntity.notFound().build();
