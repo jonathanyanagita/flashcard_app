@@ -36,7 +36,7 @@ public class Flashcard {
     private String verse;
 
     @CreatedDate
-    @Column(name = "date")
+    @Column(name = "created_date")
     private LocalDate localDate;
 
     @Column(name = "front_image")

@@ -45,6 +45,12 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Token Error", ex.getMessage());
     }
 
+    @ExceptionHandler(FlashcardRememberException.class)
+    public ResponseEntity<ErrorResponseDto> handleFlashcardRemember() {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Missing parameter.",
+                "Remember status must be provided (true or false).");
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponseDto> handleBadCredentials() {
         return buildResponse(HttpStatus.UNAUTHORIZED, "Authentication Error",

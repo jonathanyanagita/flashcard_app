@@ -1,13 +1,11 @@
 package flashcard.app.flashcard.Controller;
 
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
+import flashcard.app.flashcard.Dto.StudyDtos.RememberDto;
 import flashcard.app.flashcard.Service.FlashcardService;
 import flashcard.app.flashcard.Service.StudyService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +27,14 @@ public class StudyController {
 
         List<FlashcardResponseDto> dtos = studyService.getDueFlashcards(id);
         return ResponseEntity.ok(dtos);
+
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateStudiedFlashcard(@PathVariable UUID id, @RequestBody RememberDto remember) {
+
+        studyService.updateStudiedFlashcard(id, remember);
+        return ResponseEntity.ok().build();
 
     }
 }
