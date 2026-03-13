@@ -22,19 +22,27 @@ public class StudyController {
         this.studyService = studyService;
     }
 
-    @GetMapping("/get/{id}")
-    public ResponseEntity<List<FlashcardResponseDto>> getDueFlashcards(@PathVariable UUID id) {
+    @GetMapping("/get/{deckId}")
+    public ResponseEntity<List<FlashcardResponseDto>> getDueFlashcards(@PathVariable UUID deckId) {
 
-        List<FlashcardResponseDto> dtos = studyService.getDueFlashcards(id);
+        List<FlashcardResponseDto> dtos = studyService.getDueFlashcards(deckId);
         return ResponseEntity.ok(dtos);
 
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateStudiedFlashcard(@PathVariable UUID id, @RequestBody RememberDto remember) {
+    @PutMapping("/update/{flashcardId}")
+    public ResponseEntity<?> updateStudiedFlashcard(@PathVariable UUID flashcardId, @RequestBody RememberDto remember) {
 
-        studyService.updateStudiedFlashcard(id, remember);
+        studyService.updateStudiedFlashcard(flashcardId, remember);
         return ResponseEntity.ok().build();
+
+    }
+
+    @GetMapping("/count/{deckId}")
+    public ResponseEntity<Long> countTotalPerDeck(@PathVariable UUID deckId) {
+
+        Long total = studyService.countTotalPerDeck(deckId);
+        return ResponseEntity.ok(total);
 
     }
 }

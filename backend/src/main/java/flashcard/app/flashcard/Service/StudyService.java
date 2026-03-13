@@ -70,4 +70,8 @@ public class StudyService {
         };
 
     }
+
+    public Long countTotalPerDeck(UUID deckId) {
+        return studyRepository.countByDeckId(deckId);
+    }
 }

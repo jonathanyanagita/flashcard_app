@@ -11,4 +11,6 @@ public interface StudyRepository extends JpaRepository<Flashcard, UUID> {
 
     List<Flashcard> findByDeckIdAndNextReviewDateLessThanEqual(UUID deckId, LocalDate date);
 
+    Long countByDeckId(UUID deckId);
+
 }
