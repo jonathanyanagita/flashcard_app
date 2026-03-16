@@ -45,4 +45,12 @@ public class StudyController {
         return ResponseEntity.ok(total);
 
     }
+
+    @GetMapping("/countdue/{deckId}")
+    public ResponseEntity<Long> countTotalDuePerDeck(@PathVariable UUID deckId) {
+
+        Long total = studyService.countTotalDuePerDeck(deckId);
+        return ResponseEntity.ok(total);
+
+    }
 }

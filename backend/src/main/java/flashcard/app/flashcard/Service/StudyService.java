@@ -74,4 +74,8 @@ public class StudyService {
     public Long countTotalPerDeck(UUID deckId) {
         return studyRepository.countByDeckId(deckId);
     }
+
+    public Long countTotalDuePerDeck(UUID deckId) {
+        return  studyRepository.countByDeckIdAndNextReviewDateLessThanEqual(deckId, LocalDate.now());
+    }
 }
