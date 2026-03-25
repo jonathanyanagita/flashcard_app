@@ -3,6 +3,7 @@ package flashcard.app.flashcard.Service;
 import flashcard.app.flashcard.Dto.DeckDtos.DeckCreateDto;
 import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.User;
+import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Mapper.DeckMapper;
 import flashcard.app.flashcard.Repository.DeckRepository;
 import flashcard.app.flashcard.Repository.UserRepository;
@@ -57,6 +58,22 @@ class DeckServiceTest {
 
         Assertions.assertThat(user).isEqualTo(capturedDeck.getUser());
         Assertions.assertThat(capturedDeck).isEqualTo(realDeck);
+    }
+
+    @Test
+    void addDeck_WhenUserDoesNotExist_ShouldThrowNotFoundException() {
+        UUID userId = UUID.randomUUID();
+        DeckCreateDto dto = new DeckCreateDto(userId, "Test Deck");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> deckService.addDeck(dto))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("User not found.");
+
+        verify(deckRepository, never()).save(any(Deck.class));
+
+        verifyNoInteractions(deckMapper);
     }
 
 }
