@@ -10,9 +10,11 @@ import flashcard.app.flashcard.Repository.UserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -29,35 +31,30 @@ class DeckServiceTest {
     @Mock
     private DeckRepository deckRepository;
 
-    @Mock
-    private DeckMapper deckMapper;
+    @Spy
+    DeckMapper deckMapper = Mappers.getMapper(DeckMapper.class);
 
     @Mock
     private UserRepository userRepository;
 
     @Test
     void addDeck_WhenUserExists_ShouldSaveDeck() {
-        // Arrange
         UUID userId = UUID.randomUUID();
         DeckCreateDto dto = new DeckCreateDto(userId, "Test Deck");
         User user = new User();
-        Deck realDeck = new Deck();
-        realDeck.setUser(user);
+        user.setId(userId);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(deckMapper.toEntity(dto)).thenReturn(realDeck);
 
-        // Act
         deckService.addDeck(dto);
 
-        // Assert
         ArgumentCaptor<Deck> deckCaptor = ArgumentCaptor.forClass(Deck.class);
         verify(deckRepository).save(deckCaptor.capture());
 
         Deck capturedDeck = deckCaptor.getValue();
 
-        Assertions.assertThat(user).isEqualTo(capturedDeck.getUser());
-        Assertions.assertThat(capturedDeck).isEqualTo(realDeck);
+        Assertions.assertThat(user.getId()).isEqualTo(capturedDeck.getUser().getId());
+        Assertions.assertThat(capturedDeck.getTitle()).isEqualTo("Test Deck");
     }
 
     @Test
@@ -72,8 +69,36 @@ class DeckServiceTest {
                 .hasMessageContaining("User not found.");
 
         verify(deckRepository, never()).save(any(Deck.class));
-
         verifyNoInteractions(deckMapper);
     }
+
+    @Test
+    void deleteDeck_WhenDeckExists_ShouldDeleteDeck() {
+        UUID deckId = UUID.randomUUID();
+        Deck deck = new Deck();
+        deck.setId(deckId);
+
+        when(deckRepository.findById(deckId)).thenReturn(Optional.of(deck));
+
+        deckService.deleteDeck(deckId);
+
+        verify(deckRepository).findById(deckId);
+        verify(deckRepository).delete(deck);
+    }
+
+    @Test
+    void deleteDeck_WhenDeckDoesNotExist_ShouldThrowNotFoundException() {
+        UUID deckId = UUID.randomUUID();
+
+        when(deckRepository.findById(deckId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> deckService.deleteDeck(deckId))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Deck not found.");
+
+        verify(deckRepository, never()).save(any(Deck.class));
+
+    }
+    
 
 }
