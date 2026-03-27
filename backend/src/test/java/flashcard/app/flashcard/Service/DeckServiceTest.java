@@ -1,6 +1,7 @@
 package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Dto.DeckDtos.DeckCreateDto;
+import flashcard.app.flashcard.Dto.DeckDtos.DeckEditDto;
 import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.NotFoundException;
@@ -99,6 +100,23 @@ class DeckServiceTest {
         verify(deckRepository, never()).save(any(Deck.class));
 
     }
-    
+
+    @Test
+    void editDeckTitle_WhenDeckExists_ShouldEditDeck() {
+        UUID deckId = UUID.randomUUID();
+        DeckEditDto deckEditDto = new DeckEditDto("New Deck");
+        Deck deck = new Deck();
+        deck.setId(deckId);
+        deck.setTitle("Old Title");
+
+        when(deckRepository.findById(deckId)).thenReturn(Optional.of(deck));
+
+        deckService.editDeckTitle(deckId, deckEditDto);
+
+        Assertions.assertThat(deck.getTitle()).isEqualTo("New Deck");
+
+        verify(deckRepository).findById(deckId);
+        verify(deckRepository).save(deck);
+    }
 
 }
