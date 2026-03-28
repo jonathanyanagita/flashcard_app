@@ -2,6 +2,7 @@ package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Dto.DeckDtos.DeckCreateDto;
 import flashcard.app.flashcard.Dto.DeckDtos.DeckEditDto;
+import flashcard.app.flashcard.Dto.DeckDtos.DeckListDto;
 import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.NotFoundException;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -118,5 +120,20 @@ class DeckServiceTest {
         verify(deckRepository).findById(deckId);
         verify(deckRepository).save(deck);
     }
+
+    @Test
+    void editDeckTitle_WhenDeckDoesNotExist_ShouldThrowNotFoundException() {
+        UUID deckId = UUID.randomUUID();
+        DeckEditDto deckEditDto = new DeckEditDto("New Deck");
+
+        when(deckRepository.findById(deckId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> deckService.editDeckTitle(deckId, deckEditDto))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Deck not found.");
+
+        verify(deckRepository, never()).save(any());
+    }
+
 
 }
