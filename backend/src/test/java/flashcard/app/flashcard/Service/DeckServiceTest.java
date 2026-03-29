@@ -135,5 +135,24 @@ class DeckServiceTest {
         verify(deckRepository, never()).save(any());
     }
 
+    @Test
+    void listDecks_WhenUserHasDecks_ShouldReturnDtoList() {
+        UUID userId = UUID.randomUUID();
+        List<DeckListDto> decks = List.of(
+                new DeckListDto(UUID.randomUUID(), "Spanish Vocabulary"),
+                new DeckListDto(UUID.randomUUID(), "Japanese Vocabulary")
+        );
 
+        when(deckRepository.deckList(userId)).thenReturn(decks);
+
+        List<DeckListDto> result = deckService.listDecks(userId);
+
+        Assertions.assertThat(result).hasSize(2);
+        Assertions.assertThat(result).isEqualTo(decks);
+        Assertions.assertThat(result.getFirst().title()).isEqualTo("Spanish Vocabulary");
+        Assertions.assertThat(result.get(1).title()).isEqualTo("Japanese Vocabulary");
+
+        verify(deckRepository).deckList(userId);
+        verifyNoMoreInteractions(deckRepository);
+    }
 }
