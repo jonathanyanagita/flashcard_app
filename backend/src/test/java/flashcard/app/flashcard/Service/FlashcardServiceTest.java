@@ -73,4 +73,18 @@ class FlashcardServiceTest {
         verify(flashcardRepository, never()).save(any(Flashcard.class));
         verifyNoInteractions(flashcardMapper);
     }
+
+    @Test
+    void deleteFlashcard_WhenFlashcardExists_ShouldDeleteFlashcard() {
+        UUID flashcardId = UUID.randomUUID();
+        Flashcard flashcard = new Flashcard();
+        flashcard.setId(flashcardId);
+
+        when(flashcardRepository.findById(flashcardId)).thenReturn(Optional.of(flashcard));
+
+        flashcardService.deleteFlashcard(flashcardId);
+
+        verify(flashcardRepository).findById(flashcardId);
+        verify(flashcardRepository).delete(flashcard);
+    }
 }
