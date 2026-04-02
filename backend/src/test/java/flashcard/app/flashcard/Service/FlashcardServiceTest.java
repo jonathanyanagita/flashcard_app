@@ -87,4 +87,17 @@ class FlashcardServiceTest {
         verify(flashcardRepository).findById(flashcardId);
         verify(flashcardRepository).delete(flashcard);
     }
+
+    @Test
+    void deleteFlashcard_WhenFlashcardDoesNotExists_ShouldThrowNotFoundException() {
+        UUID flashcardId = UUID.randomUUID();
+
+        when(flashcardRepository.findById(flashcardId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> flashcardService.deleteFlashcard(flashcardId))
+                .hasMessageContaining("Flashcard not found.")
+                .isInstanceOf(NotFoundException.class);
+
+        verify(flashcardRepository, never()).delete(any(Flashcard.class));
+    }
 }
