@@ -28,15 +28,14 @@ public class DeckService {
         this.userRepository = userRepository;
     }
 
-    public void addDeck(@Valid DeckCreateDto deckCreateDto){
-
+    public Deck addDeck(@Valid DeckCreateDto deckCreateDto){
         User user = userRepository.findById(deckCreateDto.userId())
                 .orElseThrow(() -> new NotFoundException("User not found."));
 
         Deck deck = deckMapper.toEntity(deckCreateDto);
         deck.setUser(user);
         deckRepository.save(deck);
-
+        return deck;
     }
 
     public List<DeckListDto> listDecks(UUID id) {

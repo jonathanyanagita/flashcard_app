@@ -106,7 +106,7 @@ class DeckServiceTest {
     @Test
     void editDeckTitle_WhenDeckExists_ShouldEditDeck() {
         UUID deckId = UUID.randomUUID();
-        DeckEditDto deckEditDto = new DeckEditDto("New Deck");
+        DeckEditDto deckEditDto = new DeckEditDto("New Title");
         Deck deck = new Deck();
         deck.setId(deckId);
         deck.setTitle("Old Title");
@@ -115,7 +115,7 @@ class DeckServiceTest {
 
         deckService.editDeckTitle(deckId, deckEditDto);
 
-        Assertions.assertThat(deck.getTitle()).isEqualTo("New Deck");
+        Assertions.assertThat(deck.getTitle()).isEqualTo("New Title");
 
         verify(deckRepository).findById(deckId);
         verify(deckRepository).save(deck);
