@@ -1,6 +1,7 @@
 package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardCreateDto;
+import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
 import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.Flashcard;
 import flashcard.app.flashcard.Exception.NotFoundException;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -99,5 +101,23 @@ class FlashcardServiceTest {
                 .isInstanceOf(NotFoundException.class);
 
         verify(flashcardRepository, never()).delete(any(Flashcard.class));
+    }
+
+    @Test
+    void getFlashcards_WhenFlashcardExist_ShouldListAll(){
+        UUID deckId = UUID.randomUUID();
+
+        FlashcardResponseDto dto1 = new FlashcardResponseDto(UUID.randomUUID(), "Front 1", "Back 1", null, null);
+        FlashcardResponseDto dto2 = new FlashcardResponseDto(UUID.randomUUID(), "Front 2", "Back 2", null, null);
+
+        List<FlashcardResponseDto> dtos = List.of(dto1, dto2);
+
+        when(flashcardRepository.flashcardList(deckId)).thenReturn(dtos);
+
+        List<FlashcardResponseDto> result = flashcardService.getFlashcards(deckId);
+
+        Assertions.assertThat(result).hasSize(2);
+        Assertions.assertThat(result.getFirst().front()).isEqualTo("Front 1");
+        Assertions.assertThat(result.get(1).front()).isEqualTo("Front 2");
     }
 }

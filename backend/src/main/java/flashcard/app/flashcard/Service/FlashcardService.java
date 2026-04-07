@@ -55,13 +55,6 @@ public class FlashcardService {
     }
 
     public List<FlashcardResponseDto> getFlashcards(UUID deckId) {
-        List<Flashcard> allFlashcards = flashcardRepository
-                .findByDeckId(deckId);
-
-        return allFlashcards.stream()
-                .map(flashcardMapper::toDto)
-                .toList();
+        return flashcardRepository.flashcardList(deckId);
     }
-
-
 }
