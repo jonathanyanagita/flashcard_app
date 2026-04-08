@@ -28,21 +28,21 @@ public class DeckController {
         return ResponseEntity.ok().body(deck);
     }
 
-    @GetMapping("/list/{id}")
-    public ResponseEntity<List<DeckListDto>>  listDecks(@PathVariable UUID id) {
-        List<DeckListDto> decks = deckService.listDecks(id);
+    @GetMapping("/list/{userId}")
+    public ResponseEntity<List<DeckListDto>>  listDecks(@PathVariable UUID userId) {
+        List<DeckListDto> decks = deckService.listDecks(userId);
         return ResponseEntity.ok(decks);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteDeck(@PathVariable UUID id) {
-        deckService.deleteDeck(id);
-        return ResponseEntity.notFound().build();
+    @DeleteMapping("/delete/{deckId}")
+    public ResponseEntity<?> deleteDeck(@PathVariable UUID deckId) {
+        deckService.deleteDeck(deckId);
+        return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<?> updateTitle(@PathVariable UUID id, @RequestBody DeckEditDto deckEditDto) {
-        deckService.editDeckTitle(id, deckEditDto);
+    @PutMapping("/edit/{deckId}")
+    public ResponseEntity<?> updateTitle(@PathVariable UUID deckId, @RequestBody DeckEditDto deckEditDto) {
+        deckService.editDeckTitle(deckId, deckEditDto);
         return ResponseEntity.ok().build();
     }
 
