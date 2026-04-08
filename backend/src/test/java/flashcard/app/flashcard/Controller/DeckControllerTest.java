@@ -2,7 +2,9 @@ package flashcard.app.flashcard.Controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import flashcard.app.flashcard.Dto.DeckDtos.DeckCreateDto;
+import flashcard.app.flashcard.Dto.DeckDtos.DeckListDto;
 import flashcard.app.flashcard.Entity.Deck;
+import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Repository.UserRepository;
 import flashcard.app.flashcard.Service.DeckService;
 import flashcard.app.flashcard.Service.TokenService;
@@ -13,15 +15,15 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(DeckController.class)
 public class DeckControllerTest {
@@ -53,7 +55,7 @@ public class DeckControllerTest {
 
         when(deckService.addDeck(any(DeckCreateDto.class))).thenReturn(savedDeck);
 
-        mockMvc.perform(post("/decks/add")
+        mockMvc.perform(MockMvcRequestBuilders.post("/decks/add")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -62,5 +64,28 @@ public class DeckControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("My New Deck"));
 
         verify(deckService).addDeck(any(DeckCreateDto.class));
+    }
+
+    @Test
+    @WithMockUser
+    void listDecks_WhenValidRequest_ShouldReturnAllDecks() throws Exception {
+        UUID userId = UUID.randomUUID();
+        User user = new User();
+        user.setId(userId);
+
+        List<DeckListDto> list = List.of(
+                new DeckListDto(UUID.randomUUID(), "Deck Test 1"),
+                new DeckListDto(UUID.randomUUID(), "Deck Test 2"));
+
+        when(deckService.listDecks(any(UUID.class))).thenReturn(list);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/decks/list/{userId}", userId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("Deck Test 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].title").value("Deck Test 2"));
+
+        verify(deckService).listDecks(userId);
     }
 }
