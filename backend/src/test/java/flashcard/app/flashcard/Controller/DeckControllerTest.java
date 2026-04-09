@@ -88,4 +88,16 @@ public class DeckControllerTest {
 
         verify(deckService).listDecks(userId);
     }
+
+    @Test
+    @WithMockUser
+    void deleteDeck_WhenValidRequest_ShouldReturnNoContent() throws Exception {
+        UUID deckId = UUID.randomUUID();
+
+        doNothing().when(deckService).deleteDeck(any(UUID.class));
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/decks/delete/{deckId}", deckId)
+                .with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
 }
