@@ -2,6 +2,7 @@ package flashcard.app.flashcard.Controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import flashcard.app.flashcard.Dto.DeckDtos.DeckCreateDto;
+import flashcard.app.flashcard.Dto.DeckDtos.DeckEditDto;
 import flashcard.app.flashcard.Dto.DeckDtos.DeckListDto;
 import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.User;
@@ -99,5 +100,26 @@ public class DeckControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/decks/delete/{deckId}", deckId)
                 .with(csrf()))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    @WithMockUser
+    void editDeck_WhenValidRequest_ShouldReturnOk() throws Exception{
+        UUID deckId = UUID.randomUUID();
+        DeckEditDto dto = new DeckEditDto("Edited Title");
+        Deck editedDeck = new Deck();
+        editedDeck.setId(deckId);
+        editedDeck.setTitle("Edited Title");
+
+        when(deckService.editDeckTitle(any(UUID.class), any(DeckEditDto.class))).thenReturn(editedDeck);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/decks/edit/{deckId}", deckId)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Edited Title"));
+
+        verify(deckService).editDeckTitle(any(UUID.class), any(DeckEditDto.class));
     }
 }

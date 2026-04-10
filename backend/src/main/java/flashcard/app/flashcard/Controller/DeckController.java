@@ -41,9 +41,9 @@ public class DeckController {
     }
 
     @PutMapping("/edit/{deckId}")
-    public ResponseEntity<?> updateTitle(@PathVariable UUID deckId, @RequestBody DeckEditDto deckEditDto) {
-        deckService.editDeckTitle(deckId, deckEditDto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> editDeck(@PathVariable UUID deckId, @RequestBody DeckEditDto deckEditDto) {
+        Deck editedDeck = deckService.editDeckTitle(deckId, deckEditDto);
+        return ResponseEntity.ok(editedDeck);
     }
 
 }

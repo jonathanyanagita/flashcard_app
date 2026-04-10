@@ -51,13 +51,13 @@ public class DeckService {
 
     }
 
-    public void editDeckTitle(UUID id, DeckEditDto deckEditDto) {
+    public Deck editDeckTitle(UUID id, DeckEditDto deckEditDto) {
 
         Deck deck = deckRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Deck not found."));
 
         deck.setTitle(deckEditDto.title());
-        deckRepository.save(deck);
+        return deckRepository.save(deck);
 
     }
 }
