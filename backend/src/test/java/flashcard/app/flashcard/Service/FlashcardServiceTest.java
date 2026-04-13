@@ -1,6 +1,7 @@
 package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardCreateDto;
+import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardEditDto;
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
 import flashcard.app.flashcard.Entity.Deck;
 import flashcard.app.flashcard.Entity.Flashcard;
@@ -119,5 +120,40 @@ class FlashcardServiceTest {
         Assertions.assertThat(result).hasSize(2);
         Assertions.assertThat(result.getFirst().front()).isEqualTo("Front 1");
         Assertions.assertThat(result.get(1).front()).isEqualTo("Front 2");
+    }
+
+    @Test
+    void editFlashcard_WhenFlashcardExists_ShouldUpdateAndSave() {
+        UUID flashcardId = UUID.randomUUID();
+        FlashcardEditDto dto = new FlashcardEditDto("New Front", "New Verse", null, null);
+
+        Flashcard flashcard = new Flashcard();
+        flashcard.setFront("Old Front");
+        flashcard.setVerse("Old Verse");
+
+        when(flashcardRepository.findById(flashcardId)).thenReturn(Optional.of(flashcard));
+
+        flashcardService.editFlashcard(flashcardId, dto);
+
+        verify(flashcardRepository).findById(flashcardId);
+        verify(flashcardRepository).save(flashcard);
+
+        Assertions.assertThat(flashcard.getFront()).isEqualTo("New Front");
+        Assertions.assertThat(flashcard.getVerse()).isEqualTo("New Verse");
+    }
+
+    @Test
+    void editFlashcard_WhenFlashcardDoesNotExists_ShouldThrowNotFoundException() {
+        UUID flashcardId = UUID.randomUUID();
+        FlashcardEditDto dto = new FlashcardEditDto("New Front", "New Verse", null, null);
+
+        when(flashcardRepository.findById(flashcardId)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> flashcardService.editFlashcard(flashcardId, dto))
+                .hasMessageContaining("Flashcard not found.")
+                .isInstanceOf(NotFoundException.class);
+
+        verify(flashcardMapper, never()).editFlashcard(eq(dto), any(Flashcard.class));
+        verify(flashcardRepository, never()).save(any(Flashcard.class));
     }
 }

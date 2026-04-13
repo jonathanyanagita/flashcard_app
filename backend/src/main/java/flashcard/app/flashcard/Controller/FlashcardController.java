@@ -34,7 +34,7 @@ public class FlashcardController {
 
     @PutMapping("/edit/{id}")
     public ResponseEntity<?> editFlashcard(@PathVariable UUID id, @RequestBody FlashcardEditDto flashcardEditDto) {
-        flashcardService.editFlashcad(id, flashcardEditDto);
+        flashcardService.editFlashcard(id, flashcardEditDto);
         return ResponseEntity.ok().build();
     }
 

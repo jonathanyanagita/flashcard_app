@@ -45,7 +45,7 @@ public class FlashcardService {
 
         flashcardRepository.delete(flashcard);    }
 
-    public void editFlashcad(UUID id, FlashcardEditDto flashcardEditDto) {
+    public void editFlashcard(UUID id, FlashcardEditDto flashcardEditDto) {
 
         Flashcard flashcard = flashcardRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Flashcard not found."));
