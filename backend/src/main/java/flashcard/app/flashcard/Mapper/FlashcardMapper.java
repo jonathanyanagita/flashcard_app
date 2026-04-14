@@ -6,6 +6,8 @@ import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
 import flashcard.app.flashcard.Entity.Flashcard;
 import org.mapstruct.*;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface FlashcardMapper {
 
@@ -18,5 +20,5 @@ public interface FlashcardMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     Flashcard editFlashcard (FlashcardEditDto flashcardEditDto, @MappingTarget Flashcard flashcard);
 
-    FlashcardResponseDto toDto(Flashcard flashcard);
+    List<FlashcardResponseDto> toDtoList(List<Flashcard> flashcards);
 }

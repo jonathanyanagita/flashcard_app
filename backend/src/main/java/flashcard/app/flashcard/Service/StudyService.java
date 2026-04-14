@@ -25,12 +25,7 @@ public class StudyService {
     }
 
     public List<FlashcardResponseDto> getDueFlashcards(UUID deckId) {
-        List<Flashcard> dueCards = studyRepository
-                .findByDeckIdAndNextReviewDateLessThanEqual(deckId, LocalDate.now());
-
-        return dueCards.stream()
-                .map(flashcardMapper::toDto)
-                .toList();
+        return flashcardMapper.toDtoList(studyRepository.findByDeckIdAndNextReviewDateLessThanEqual(deckId, LocalDate.now()));
     }
 
     public void updateStudiedFlashcard(UUID id,  RememberDto rememberDto) {

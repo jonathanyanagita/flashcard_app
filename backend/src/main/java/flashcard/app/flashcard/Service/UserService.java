@@ -35,10 +35,6 @@ public class UserService {
         this.tokenService = tokenService;
     }
 
-    public User saveUser(User user){
-        return userRepository.save(user);
-    }
-
     @Transactional
     public void registerUser(UserCreateDto userCreateDto) {
 
