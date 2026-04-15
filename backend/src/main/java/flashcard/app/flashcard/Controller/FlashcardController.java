@@ -3,6 +3,7 @@ package flashcard.app.flashcard.Controller;
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardCreateDto;
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardEditDto;
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
+import flashcard.app.flashcard.Entity.Flashcard;
 import flashcard.app.flashcard.Service.FlashcardService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,28 +21,28 @@ public class FlashcardController {
         this.flashcardService = flashcardService;
     }
 
-    @PostMapping("/add/{id}")
-    public ResponseEntity<?> addFlashcard(@PathVariable UUID id, @RequestBody FlashcardCreateDto flashcardCreateDto) {
-        flashcardService.addFlashcard(id, flashcardCreateDto);
+    @PostMapping("/add/{deckId}")
+    public ResponseEntity<?> addFlashcard(@PathVariable UUID deckId, @RequestBody FlashcardCreateDto flashcardCreateDto) {
+        Flashcard newFlashcad = flashcardService.addFlashcard(deckId, flashcardCreateDto);
+        return ResponseEntity.ok().body(newFlashcad);
+    }
+
+    @DeleteMapping("/delete/{flashcardId}")
+    public ResponseEntity<?> deleteFlashcard(@PathVariable UUID flashcardId) {
+        flashcardService.deleteFlashcard(flashcardId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/edit/{flashcardId}")
+    public ResponseEntity<?> editFlashcard(@PathVariable UUID flashcardId, @RequestBody FlashcardEditDto flashcardEditDto) {
+        flashcardService.editFlashcard(flashcardId, flashcardEditDto);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteFlashcard(@PathVariable UUID id) {
-        flashcardService.deleteFlashcard(id);
-        return ResponseEntity.notFound().build();
-    }
+    @GetMapping("/get/{deckId}")
+    public ResponseEntity<List<FlashcardResponseDto>>  getAllFlashcards(@PathVariable UUID deckId) {
 
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<?> editFlashcard(@PathVariable UUID id, @RequestBody FlashcardEditDto flashcardEditDto) {
-        flashcardService.editFlashcard(id, flashcardEditDto);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/get/{id}")
-    public ResponseEntity<List<FlashcardResponseDto>>  getAllFlashcards(@PathVariable UUID id) {
-
-        List<FlashcardResponseDto> dtos = flashcardService.getFlashcards(id);
+        List<FlashcardResponseDto> dtos = flashcardService.getFlashcards(deckId);
         return ResponseEntity.ok(dtos);
 
     }
