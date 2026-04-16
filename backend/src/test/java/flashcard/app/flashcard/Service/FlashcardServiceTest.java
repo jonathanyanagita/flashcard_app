@@ -125,7 +125,7 @@ class FlashcardServiceTest {
     @Test
     void editFlashcard_WhenFlashcardExists_ShouldUpdateAndSave() {
         UUID flashcardId = UUID.randomUUID();
-        FlashcardEditDto dto = new FlashcardEditDto("New Front", "New Verse", null, null);
+        FlashcardEditDto dto = new FlashcardEditDto("New Front", "New Verse", "frontimage.png", "backimage.png");
 
         Flashcard flashcard = new Flashcard();
         flashcard.setFront("Old Front");

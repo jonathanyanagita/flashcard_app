@@ -27,15 +27,14 @@ public class FlashcardService {
         this.flashcardMapper = flashcardMapper;
     }
 
-    public void addFlashcard(UUID id, FlashcardCreateDto flashcardCreateDto) {
+    public Flashcard addFlashcard(UUID id, FlashcardCreateDto flashcardCreateDto) {
 
         Deck deck = deckRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Deck not found."));
 
         Flashcard newFlashcard = flashcardMapper.toEntity(flashcardCreateDto);
         newFlashcard.setDeck(deck);
-        flashcardRepository.save(newFlashcard);
-
+        return flashcardRepository.save(newFlashcard);
     }
 
     public void deleteFlashcard(UUID id) {
