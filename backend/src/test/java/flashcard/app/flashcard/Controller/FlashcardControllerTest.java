@@ -2,6 +2,8 @@ package flashcard.app.flashcard.Controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardCreateDto;
+import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardEditDto;
+import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
 import flashcard.app.flashcard.Entity.Flashcard;
 import flashcard.app.flashcard.Repository.UserRepository;
 import flashcard.app.flashcard.Service.FlashcardService;
@@ -16,10 +18,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(FlashcardController.class)
@@ -59,5 +61,19 @@ public class FlashcardControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.frontImage").value("frontimage.png"));
 
         verify(flashcardService).addFlashcard(deckId, dto);
+    }
+
+    @Test
+    @WithMockUser
+    void deleteFlashcard_WhenValidRequest_ShouldReturnNoContent() throws Exception{
+        UUID flashcardId = UUID.randomUUID();
+
+        doNothing().when(flashcardService).deleteFlashcard(flashcardId);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/flashcards/delete/{flashcardID}", flashcardId)
+                .with(csrf()))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        verify(flashcardService).deleteFlashcard(flashcardId);
     }
 }
