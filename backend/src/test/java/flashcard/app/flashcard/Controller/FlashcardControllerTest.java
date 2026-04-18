@@ -76,4 +76,21 @@ public class FlashcardControllerTest {
 
         verify(flashcardService).deleteFlashcard(flashcardId);
     }
+
+    @Test
+    @WithMockUser
+    void editFlashcard_WhenValidRequest_ShouldReturnOk() throws Exception{
+        UUID flashcardId = UUID.randomUUID();
+        FlashcardEditDto dto = new FlashcardEditDto("Front","Back",null,null);
+
+        doNothing().when(flashcardService).editFlashcard(flashcardId, dto);
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/flashcards/edit/{flashcardId}", flashcardId)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                        .andExpect(MockMvcResultMatchers.status().isOk());
+
+        verify(flashcardService).editFlashcard(flashcardId, dto);
+    }
 }
