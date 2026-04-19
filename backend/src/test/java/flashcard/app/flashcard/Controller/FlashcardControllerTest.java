@@ -93,4 +93,25 @@ public class FlashcardControllerTest {
 
         verify(flashcardService).editFlashcard(flashcardId, dto);
     }
+
+    @Test
+    @WithMockUser
+    void getFlashcards_WhenValidRequest_ShouldReturnListOfFlashcardsAndOk() throws Exception{
+        UUID deckId = UUID.randomUUID();
+        List<FlashcardResponseDto> list = List.of(
+                new FlashcardResponseDto(UUID.randomUUID(), "Front 1", "Back 1", "frontimage1.png", "backimage.png"),
+                new FlashcardResponseDto(UUID.randomUUID(), "Front 2", "Back 2", "frontimage2.png", "backimage.png")
+        );
+
+        when(flashcardService.getFlashcards(deckId)).thenReturn(list);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/flashcards/get/{deckId}", deckId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].front").value("Front 1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].frontImage").value("frontimage1.png"));
+
+        verify(flashcardService).getFlashcards(deckId);
+    }
 }
