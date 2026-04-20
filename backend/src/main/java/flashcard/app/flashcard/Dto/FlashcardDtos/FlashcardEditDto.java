@@ -9,9 +9,9 @@ public record FlashcardEditDto(
         @Size(max = 1000)
         String front,
 
-        @NotBlank(message = "The back (verse) of the card cannot be empty")
+        @NotBlank(message = "The back of the card cannot be empty")
         @Size(max = 1000)
-        String verse,
+        String back,
 
         String frontImage,
         String backImage

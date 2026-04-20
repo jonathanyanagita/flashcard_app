@@ -31,10 +31,10 @@ public class Flashcard {
     @Column(name = "front", length = 1000)
     private String front;
 
-    @NotBlank(message = "The back (verse) of the card cannot be empty.")
+    @NotBlank(message = "The back of the card cannot be empty.")
     @Size(max = 1000)
-    @Column(name = "verse", length = 1000)
-    private String verse;
+    @Column(name = "back", length = 1000)
+    private String back;
 
     @CreatedDate
     @Column(name = "created_date")

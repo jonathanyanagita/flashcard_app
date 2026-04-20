@@ -15,7 +15,7 @@ public interface FlashcardRepository extends JpaRepository<Flashcard, UUID> {
 
     List<Flashcard> findByDeckId(UUID deckId);
 
-    @Query("Select new flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto(f.id, f.front, f.verse, f.frontImage, f.backImage) " +
+    @Query("Select new flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto(f.id, f.front, f.back, f.frontImage, f.backImage) " +
             "from Flashcard f where f.deck.id = :deckId")
     List<FlashcardResponseDto> flashcardList(@Param("deckId") UUID deckId);
 }

@@ -6,7 +6,7 @@ public record FlashcardResponseDto(
 
         UUID id,
         String front,
-        String verse,
+        String back,
         String frontImage,
         String backImage
 ) {

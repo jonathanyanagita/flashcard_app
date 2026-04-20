@@ -47,7 +47,7 @@ public class FlashcardControllerTest {
     void addFlashcard_WhenValidRequest_ShouldReturnSavedFlashcardAndOk() throws Exception{
         UUID deckId =  UUID.randomUUID();
         FlashcardCreateDto dto = new FlashcardCreateDto("Front", "Back","frontimage.png","backimage.png");
-        Flashcard newFlashcard = Flashcard.builder().front(dto.front()).verse(dto.verse()).frontImage(dto.frontImage()).backImage(dto.backImage()).build();
+        Flashcard newFlashcard = Flashcard.builder().front(dto.front()).back(dto.back()).frontImage(dto.frontImage()).backImage(dto.backImage()).build();
 
         when(flashcardService.addFlashcard(deckId, dto)).thenReturn(newFlashcard);
 
@@ -57,7 +57,7 @@ public class FlashcardControllerTest {
                 .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.front").value("Front"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.verse").value("Back"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.back").value("Back"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.frontImage").value("frontimage.png"));
 
         verify(flashcardService).addFlashcard(deckId, dto);

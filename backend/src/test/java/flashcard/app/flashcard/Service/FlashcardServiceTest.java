@@ -45,7 +45,7 @@ class FlashcardServiceTest {
         UUID deckId = UUID.randomUUID();
         Deck deck = new Deck();
         deck.setId(deckId);
-        FlashcardCreateDto flashcardCreateDto = new FlashcardCreateDto("Front","Verse",null,null);
+        FlashcardCreateDto flashcardCreateDto = new FlashcardCreateDto("Front","Back",null,null);
 
         when(deckRepository.findById(deckId)).thenReturn(Optional.of(deck));
 
@@ -58,14 +58,14 @@ class FlashcardServiceTest {
 
         Assertions.assertThat(deck.getId()).isEqualTo(capturedFlashcard.getDeck().getId());
         Assertions.assertThat(capturedFlashcard.getFront()).isEqualTo("Front");
-        Assertions.assertThat(capturedFlashcard.getVerse()).isEqualTo("Verse");
+        Assertions.assertThat(capturedFlashcard.getBack()).isEqualTo("Back");
         Assertions.assertThat(capturedFlashcard.getFrontImage()).isNull();
     }
 
     @Test
     void addFlashcard_WhenDeckDoesNotExists_ShouldThrowNotFoundException(){
         UUID deckId = UUID.randomUUID();
-        FlashcardCreateDto flashcardCreateDto = new FlashcardCreateDto("Front","Verse",null,null);
+        FlashcardCreateDto flashcardCreateDto = new FlashcardCreateDto("Front","Back",null,null);
 
         when(deckRepository.findById(deckId)).thenReturn(Optional.empty());
 
@@ -125,11 +125,11 @@ class FlashcardServiceTest {
     @Test
     void editFlashcard_WhenFlashcardExists_ShouldUpdateAndSave() {
         UUID flashcardId = UUID.randomUUID();
-        FlashcardEditDto dto = new FlashcardEditDto("New Front", "New Verse", "frontimage.png", "backimage.png");
+        FlashcardEditDto dto = new FlashcardEditDto("New Front", "New Back", "frontimage.png", "backimage.png");
 
         Flashcard flashcard = new Flashcard();
         flashcard.setFront("Old Front");
-        flashcard.setVerse("Old Verse");
+        flashcard.setBack("Old Back");
 
         when(flashcardRepository.findById(flashcardId)).thenReturn(Optional.of(flashcard));
 
@@ -139,13 +139,13 @@ class FlashcardServiceTest {
         verify(flashcardRepository).save(flashcard);
 
         Assertions.assertThat(flashcard.getFront()).isEqualTo("New Front");
-        Assertions.assertThat(flashcard.getVerse()).isEqualTo("New Verse");
+        Assertions.assertThat(flashcard.getBack()).isEqualTo("New Back");
     }
 
     @Test
     void editFlashcard_WhenFlashcardDoesNotExists_ShouldThrowNotFoundException() {
         UUID flashcardId = UUID.randomUUID();
-        FlashcardEditDto dto = new FlashcardEditDto("New Front", "New Verse", null, null);
+        FlashcardEditDto dto = new FlashcardEditDto("New Front", "New Back", null, null);
 
         when(flashcardRepository.findById(flashcardId)).thenReturn(Optional.empty());
 
