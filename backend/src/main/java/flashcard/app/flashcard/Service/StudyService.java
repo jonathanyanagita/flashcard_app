@@ -28,7 +28,7 @@ public class StudyService {
         return flashcardMapper.toDtoList(studyRepository.findByDeckIdAndNextReviewDateLessThanEqual(deckId, LocalDate.now()));
     }
 
-    public void updateStudiedFlashcard(UUID id,  RememberDto rememberDto) {
+    public Flashcard updateStudiedFlashcard(UUID id,  RememberDto rememberDto) {
 
         if (rememberDto == null || rememberDto.remember() == null) {
             throw new FlashcardRememberException(null);
@@ -51,7 +51,7 @@ public class StudyService {
             flashcard.setNextReviewDate(LocalDate.now().plusDays(1));
         }
 
-        studyRepository.save(flashcard);
+        return studyRepository.save(flashcard);
     }
 
     private LocalDate calculateNextReview(int boxLevel) {

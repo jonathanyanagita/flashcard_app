@@ -2,6 +2,7 @@ package flashcard.app.flashcard.Controller;
 
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
 import flashcard.app.flashcard.Dto.StudyDtos.RememberDto;
+import flashcard.app.flashcard.Entity.Flashcard;
 import flashcard.app.flashcard.Service.FlashcardService;
 import flashcard.app.flashcard.Service.StudyService;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +34,8 @@ public class StudyController {
     @PutMapping("/update/{flashcardId}")
     public ResponseEntity<?> updateStudiedFlashcard(@PathVariable UUID flashcardId, @RequestBody RememberDto remember) {
 
-        studyService.updateStudiedFlashcard(flashcardId, remember);
-        return ResponseEntity.ok().build();
+        Flashcard updatedFlashcard = studyService.updateStudiedFlashcard(flashcardId, remember);
+        return ResponseEntity.ok(updatedFlashcard);
 
     }
 
