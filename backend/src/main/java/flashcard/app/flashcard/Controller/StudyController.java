@@ -3,11 +3,11 @@ package flashcard.app.flashcard.Controller;
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
 import flashcard.app.flashcard.Dto.StudyDtos.RememberDto;
 import flashcard.app.flashcard.Entity.Flashcard;
-import flashcard.app.flashcard.Service.FlashcardService;
 import flashcard.app.flashcard.Service.StudyService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,11 +15,9 @@ import java.util.UUID;
 @RequestMapping("/study")
 public class StudyController {
 
-    private final FlashcardService flashcardService;
     private final StudyService studyService;
 
-    public StudyController(FlashcardService flashcardService, StudyService studyService) {
-        this.flashcardService = flashcardService;
+    public StudyController(StudyService studyService) {
         this.studyService = studyService;
     }
 
@@ -50,7 +48,7 @@ public class StudyController {
     @GetMapping("/countdue/{deckId}")
     public ResponseEntity<Long> countTotalDuePerDeck(@PathVariable UUID deckId) {
 
-        Long total = studyService.countTotalDuePerDeck(deckId);
+        Long total = studyService.countTotalDuePerDeck(deckId, LocalDate.now());
         return ResponseEntity.ok(total);
 
     }

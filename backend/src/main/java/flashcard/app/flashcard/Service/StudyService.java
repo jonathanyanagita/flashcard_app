@@ -3,10 +3,10 @@ package flashcard.app.flashcard.Service;
 import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
 import flashcard.app.flashcard.Dto.StudyDtos.RememberDto;
 import flashcard.app.flashcard.Entity.Flashcard;
-import flashcard.app.flashcard.Exception.FlashcardRememberException;
 import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Mapper.FlashcardMapper;
-import flashcard.app.flashcard.Repository.StudyRepository;
+import flashcard.app.flashcard.Repository.DeckRepository;
+import flashcard.app.flashcard.Repository.FlashcardRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,25 +16,23 @@ import java.util.UUID;
 @Service
 public class StudyService {
 
-    private final StudyRepository studyRepository;
+    private final FlashcardRepository flashcardRepository;
+    private final DeckRepository deckRepository;
     private final FlashcardMapper flashcardMapper;
 
-    public StudyService (StudyRepository studyRepository, FlashcardMapper flashcardMapper) {
-        this.studyRepository = studyRepository;
+    public StudyService (FlashcardRepository flashcardRepository, FlashcardMapper flashcardMapper, DeckRepository deckRepository) {
+        this.flashcardRepository = flashcardRepository;
+        this.deckRepository = deckRepository;
         this.flashcardMapper = flashcardMapper;
     }
 
     public List<FlashcardResponseDto> getDueFlashcards(UUID deckId) {
-        return flashcardMapper.toDtoList(studyRepository.findByDeckIdAndNextReviewDateLessThanEqual(deckId, LocalDate.now()));
+        return flashcardMapper.toDtoList(flashcardRepository.findByDeckIdAndNextReviewDateLessThanEqual(deckId, LocalDate.now()));
     }
 
     public Flashcard updateStudiedFlashcard(UUID id,  RememberDto rememberDto) {
 
-        if (rememberDto == null || rememberDto.remember() == null) {
-            throw new FlashcardRememberException(null);
-        }
-
-        Flashcard flashcard = studyRepository.findById(id)
+        Flashcard flashcard = flashcardRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("Flashcard not found"));
 
         if (Boolean.TRUE.equals(rememberDto.remember())) {
@@ -51,7 +49,7 @@ public class StudyService {
             flashcard.setNextReviewDate(LocalDate.now().plusDays(1));
         }
 
-        return studyRepository.save(flashcard);
+        return flashcardRepository.save(flashcard);
     }
 
     private LocalDate calculateNextReview(int boxLevel) {
@@ -66,11 +64,19 @@ public class StudyService {
 
     }
 
-    public Long countTotalPerDeck(UUID deckId) {
-        return studyRepository.countByDeckId(deckId);
+    private void checkIfDeckExists(UUID deckId){
+        if (!deckRepository.existsById(deckId)) {
+            throw new NotFoundException("Deck not found.");
+        }
     }
 
-    public Long countTotalDuePerDeck(UUID deckId) {
-        return  studyRepository.countByDeckIdAndNextReviewDateLessThanEqual(deckId, LocalDate.now());
+    public Long countTotalPerDeck(UUID deckId) {
+        checkIfDeckExists(deckId);
+        return flashcardRepository.countByDeckId(deckId);
+    }
+
+    public Long countTotalDuePerDeck(UUID deckId, LocalDate date) {
+        checkIfDeckExists(deckId);
+        return  flashcardRepository.countByDeckIdAndNextReviewDateLessThanEqual(deckId, date);
     }
 }
