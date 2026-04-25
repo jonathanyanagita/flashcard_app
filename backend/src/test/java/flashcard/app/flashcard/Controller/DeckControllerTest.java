@@ -111,7 +111,7 @@ public class DeckControllerTest {
         editedDeck.setId(deckId);
         editedDeck.setTitle("Edited Title");
 
-        when(deckService.editDeckTitle(any(UUID.class), any(DeckEditDto.class))).thenReturn(editedDeck);
+        when(deckService.editDeckTitle(deckId, dto)).thenReturn(editedDeck);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/decks/edit/{deckId}", deckId)
                 .with(csrf())
@@ -120,6 +120,6 @@ public class DeckControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.title").value("Edited Title"));
 
-        verify(deckService).editDeckTitle(any(UUID.class), any(DeckEditDto.class));
+        verify(deckService).editDeckTitle(deckId, dto);
     }
 }

@@ -112,10 +112,11 @@ class DeckServiceTest {
         deck.setTitle("Old Title");
 
         when(deckRepository.findById(deckId)).thenReturn(Optional.of(deck));
+        when(deckRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
-        deckService.editDeckTitle(deckId, deckEditDto);
+        Deck result = deckService.editDeckTitle(deckId, deckEditDto);
 
-        Assertions.assertThat(deck.getTitle()).isEqualTo("New Title");
+        Assertions.assertThat(result.getTitle()).isEqualTo("New Title");
 
         verify(deckRepository).findById(deckId);
         verify(deckRepository).save(deck);
