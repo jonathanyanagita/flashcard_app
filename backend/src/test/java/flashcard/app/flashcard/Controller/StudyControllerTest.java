@@ -81,4 +81,32 @@ public class StudyControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.nextReviewDate").value("2020-01-03"));
     }
+
+    @Test
+    @WithMockUser
+    void countTotalPerDeck_WhenValid_ShouldReturnTotalNumberPerDeckAndOk() throws Exception{
+        UUID deckId = UUID.randomUUID();
+        Long expectedCount = 5L;
+
+        when(studyService.countTotalPerDeck(deckId)).thenReturn(expectedCount);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/study/count/{deckId}", deckId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(expectedCount.toString()));
+    }
+
+    @Test
+    @WithMockUser
+    void countTotalDuePerDeck_WhenValid_ShouldReturnTotalDuePerDeckAndOk() throws Exception{
+        UUID deckId = UUID.randomUUID();
+        Long expectedCount = 4L;
+
+        when(studyService.countTotalDuePerDeck(deckId, LocalDate.now())).thenReturn(expectedCount);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/study/countdue/{deckId}", deckId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string(expectedCount.toString()));
+    }
 }
