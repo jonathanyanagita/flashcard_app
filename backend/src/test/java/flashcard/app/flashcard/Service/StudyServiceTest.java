@@ -4,7 +4,8 @@ import flashcard.app.flashcard.Dto.FlashcardDtos.FlashcardResponseDto;
 import flashcard.app.flashcard.Dto.StudyDtos.RememberDto;
 import flashcard.app.flashcard.Entity.Flashcard;
 import flashcard.app.flashcard.Mapper.FlashcardMapper;
-import flashcard.app.flashcard.Repository.StudyRepository;
+import flashcard.app.flashcard.Repository.DeckRepository;
+import flashcard.app.flashcard.Repository.FlashcardRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,9 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.test.context.support.WithMockUser;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -30,7 +32,10 @@ class StudyServiceTest {
     StudyService studyService;
 
     @Mock
-    StudyRepository studyRepository;
+    FlashcardRepository flashcardRepository;
+
+    @Mock
+    DeckRepository deckRepository;
 
     @Spy
     FlashcardMapper flashcardMapper = Mappers.getMapper(FlashcardMapper.class);
@@ -44,7 +49,7 @@ class StudyServiceTest {
                 Flashcard.builder().front("Front 2").back("Back 2").build()
         );
 
-        when(studyRepository.findByDeckIdAndNextReviewDateLessThanEqual(eq(deckId), any())).thenReturn(flashcardList);
+        when(flashcardRepository.findByDeckIdAndNextReviewDateLessThanEqual(eq(deckId), any())).thenReturn(flashcardList);
 
         List<FlashcardResponseDto> result = studyService.getDueFlashcards(deckId);
 
@@ -56,11 +61,22 @@ class StudyServiceTest {
     }
 
     @Test
-    @WithMockUser
-    void updateStudiedFlashcard_WhenRemember_ShouldUpdateBoxLevelAndReviewDate() {
-        UUID flashcardId = UUID.randomUUID();
+    void updateStudiedFlashcard_whenRememberIsTrue_shouldIncreaseBoxLevelAndUpdateDates() {
+        UUID id = UUID.randomUUID();
+        Flashcard flashcard = new Flashcard();
+        flashcard.setId(id);
+        flashcard.setBoxLevel(2);
         RememberDto dto = new RememberDto(true);
 
+        when(flashcardRepository.findById(id)).thenReturn(Optional.of(flashcard));
+        when(flashcardRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
+        Flashcard result = studyService.updateStudiedFlashcard(id, dto);
+
+        Assertions.assertThat(result.getBoxLevel()).isEqualTo(3);
+        Assertions.assertThat(result.getLastReviewDate()).isEqualTo(LocalDate.now());
+        Assertions.assertThat(result.getNextReviewDate()).isEqualTo(LocalDate.now().plusDays(4));
+
+        verify(flashcardRepository).save(result);
     }
 }
