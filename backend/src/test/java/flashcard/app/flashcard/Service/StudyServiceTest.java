@@ -112,4 +112,21 @@ class StudyServiceTest {
 
         verify(flashcardRepository, never()).save(any());
     }
+
+    @Test
+    void countTotalPerDeck_IfDeckExists_ShouldReturnTotalNumberOfCards(){
+        UUID deckId = UUID.randomUUID();
+        List<Flashcard> flashcards = List.of(
+                Flashcard.builder().front("Front 1").back("Back 1").build(),
+                Flashcard.builder().front("Front 2").back("Back 2").build(),
+                Flashcard.builder().front("Front 3").back("Back 3").build()
+        );
+
+        when(deckRepository.existsById(deckId)).thenReturn(true);
+        when(flashcardRepository.countByDeckId(deckId)).thenReturn((long) flashcards.size());
+
+        Long result = studyService.countTotalPerDeck(deckId);
+
+        Assertions.assertThat(result).isEqualTo(3L);
+    }
 }
