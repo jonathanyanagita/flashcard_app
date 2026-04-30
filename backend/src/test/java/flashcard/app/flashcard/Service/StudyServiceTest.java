@@ -129,4 +129,36 @@ class StudyServiceTest {
 
         Assertions.assertThat(result).isEqualTo(3L);
     }
+
+    @Test
+    void countTotalPerDeck_IfDeckDoesNotExists_ShouldThrowNotFoundException(){
+        UUID deckId = UUID.randomUUID();
+
+        when(deckRepository.existsById(deckId)).thenReturn(false);
+
+        Assertions.assertThatThrownBy(()-> studyService.countTotalPerDeck(deckId))
+                .hasMessageContaining("Deck not found.")
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    void countDuePerDeck_IfDeckExists_ShouldReturnNumberOfDueCards(){
+        UUID deckId = UUID.randomUUID();
+        LocalDate defaultDate = LocalDate.of(2020,10,1);
+
+        List<Flashcard> flashcards = List.of(
+                Flashcard.builder().front("Front 1").back("Back 1").nextReviewDate(defaultDate).build(),
+                Flashcard.builder().front("Front 2").back("Back 2").nextReviewDate(defaultDate).build(),
+                Flashcard.builder().front("Front 3").back("Back 3").nextReviewDate(defaultDate.plusDays(2)).build()
+        );
+
+        long expectedDueCount = flashcards.stream().filter(flashcard -> !flashcard.getNextReviewDate().isAfter(defaultDate)).count();
+
+        when(deckRepository.existsById(deckId)).thenReturn(true);
+        when(flashcardRepository.countByDeckIdAndNextReviewDateLessThanEqual(deckId, defaultDate)).thenReturn(expectedDueCount);
+
+        Long result = studyService.countTotalDuePerDeck(deckId, defaultDate);
+
+        Assertions.assertThat(result).isEqualTo(2L);
+    }
 }
