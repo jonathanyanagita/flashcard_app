@@ -1,6 +1,5 @@
 package flashcard.app.flashcard.Service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -10,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,8 +35,8 @@ class EmailServiceTest {
 
         SimpleMailMessage capturedMessage = messageCaptor.getValue();
 
-        Assertions.assertThat(capturedMessage.getTo()).containsExactly(to);
-        Assertions.assertThat(capturedMessage.getSubject()).isEqualTo(subject);
-        Assertions.assertThat(capturedMessage.getText()).isEqualTo(text);
+        assertThat(capturedMessage.getTo()).containsExactly(to);
+        assertThat(capturedMessage.getSubject()).isEqualTo(subject);
+        assertThat(capturedMessage.getText()).isEqualTo(text);
     }
 }

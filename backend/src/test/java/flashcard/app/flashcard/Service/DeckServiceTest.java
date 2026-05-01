@@ -9,7 +9,6 @@ import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Mapper.DeckMapper;
 import flashcard.app.flashcard.Repository.DeckRepository;
 import flashcard.app.flashcard.Repository.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -23,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,8 +57,8 @@ class DeckServiceTest {
 
         Deck capturedDeck = deckCaptor.getValue();
 
-        Assertions.assertThat(user.getId()).isEqualTo(capturedDeck.getUser().getId());
-        Assertions.assertThat(capturedDeck.getTitle()).isEqualTo("Test Deck");
+        assertThat(user.getId()).isEqualTo(capturedDeck.getUser().getId());
+        assertThat(capturedDeck.getTitle()).isEqualTo("Test Deck");
     }
 
     @Test
@@ -67,7 +68,7 @@ class DeckServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> deckService.addDeck(dto))
+        assertThatThrownBy(() -> deckService.addDeck(dto))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("User not found.");
 
@@ -95,7 +96,7 @@ class DeckServiceTest {
 
         when(deckRepository.findById(deckId)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> deckService.deleteDeck(deckId))
+        assertThatThrownBy(() -> deckService.deleteDeck(deckId))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Deck not found.");
 
@@ -116,7 +117,7 @@ class DeckServiceTest {
 
         Deck result = deckService.editDeckTitle(deckId, deckEditDto);
 
-        Assertions.assertThat(result.getTitle()).isEqualTo("New Title");
+        assertThat(result.getTitle()).isEqualTo("New Title");
 
         verify(deckRepository).findById(deckId);
         verify(deckRepository).save(deck);
@@ -129,7 +130,7 @@ class DeckServiceTest {
 
         when(deckRepository.findById(deckId)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> deckService.editDeckTitle(deckId, deckEditDto))
+        assertThatThrownBy(() -> deckService.editDeckTitle(deckId, deckEditDto))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Deck not found.");
 
@@ -148,10 +149,10 @@ class DeckServiceTest {
 
         List<DeckListDto> result = deckService.listDecks(userId);
 
-        Assertions.assertThat(result).hasSize(2);
-        Assertions.assertThat(result).isEqualTo(decks);
-        Assertions.assertThat(result.getFirst().title()).isEqualTo("Spanish Vocabulary");
-        Assertions.assertThat(result.get(1).title()).isEqualTo("Japanese Vocabulary");
+        assertThat(result).hasSize(2);
+        assertThat(result).isEqualTo(decks);
+        assertThat(result.getFirst().title()).isEqualTo("Spanish Vocabulary");
+        assertThat(result.get(1).title()).isEqualTo("Japanese Vocabulary");
 
         verify(deckRepository).deckList(userId);
         verifyNoMoreInteractions(deckRepository);

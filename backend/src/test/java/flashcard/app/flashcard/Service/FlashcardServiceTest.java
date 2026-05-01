@@ -9,7 +9,6 @@ import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Mapper.FlashcardMapper;
 import flashcard.app.flashcard.Repository.DeckRepository;
 import flashcard.app.flashcard.Repository.FlashcardRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -23,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,10 +57,10 @@ class FlashcardServiceTest {
 
         Flashcard capturedFlashcard = flashcardCaptor.getValue();
 
-        Assertions.assertThat(deck.getId()).isEqualTo(capturedFlashcard.getDeck().getId());
-        Assertions.assertThat(capturedFlashcard.getFront()).isEqualTo("Front");
-        Assertions.assertThat(capturedFlashcard.getBack()).isEqualTo("Back");
-        Assertions.assertThat(capturedFlashcard.getFrontImage()).isNull();
+        assertThat(deck.getId()).isEqualTo(capturedFlashcard.getDeck().getId());
+        assertThat(capturedFlashcard.getFront()).isEqualTo("Front");
+        assertThat(capturedFlashcard.getBack()).isEqualTo("Back");
+        assertThat(capturedFlashcard.getFrontImage()).isNull();
     }
 
     @Test
@@ -69,7 +70,7 @@ class FlashcardServiceTest {
 
         when(deckRepository.findById(deckId)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> flashcardService.addFlashcard(deckId,flashcardCreateDto))
+        assertThatThrownBy(() -> flashcardService.addFlashcard(deckId,flashcardCreateDto))
                 .hasMessageContaining("Deck not found.")
                 .isInstanceOf(NotFoundException.class);
 
@@ -97,7 +98,7 @@ class FlashcardServiceTest {
 
         when(flashcardRepository.findById(flashcardId)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> flashcardService.deleteFlashcard(flashcardId))
+        assertThatThrownBy(() -> flashcardService.deleteFlashcard(flashcardId))
                 .hasMessageContaining("Flashcard not found.")
                 .isInstanceOf(NotFoundException.class);
 
@@ -117,9 +118,9 @@ class FlashcardServiceTest {
 
         List<FlashcardResponseDto> result = flashcardService.getFlashcards(deckId);
 
-        Assertions.assertThat(result).hasSize(2);
-        Assertions.assertThat(result.getFirst().front()).isEqualTo("Front 1");
-        Assertions.assertThat(result.get(1).front()).isEqualTo("Front 2");
+        assertThat(result).hasSize(2);
+        assertThat(result.getFirst().front()).isEqualTo("Front 1");
+        assertThat(result.get(1).front()).isEqualTo("Front 2");
     }
 
     @Test
@@ -138,8 +139,8 @@ class FlashcardServiceTest {
         verify(flashcardRepository).findById(flashcardId);
         verify(flashcardRepository).save(flashcard);
 
-        Assertions.assertThat(flashcard.getFront()).isEqualTo("New Front");
-        Assertions.assertThat(flashcard.getBack()).isEqualTo("New Back");
+        assertThat(flashcard.getFront()).isEqualTo("New Front");
+        assertThat(flashcard.getBack()).isEqualTo("New Back");
     }
 
     @Test
@@ -149,7 +150,7 @@ class FlashcardServiceTest {
 
         when(flashcardRepository.findById(flashcardId)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> flashcardService.editFlashcard(flashcardId, dto))
+        assertThatThrownBy(() -> flashcardService.editFlashcard(flashcardId, dto))
                 .hasMessageContaining("Flashcard not found.")
                 .isInstanceOf(NotFoundException.class);
 

@@ -7,7 +7,6 @@ import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Mapper.FlashcardMapper;
 import flashcard.app.flashcard.Repository.DeckRepository;
 import flashcard.app.flashcard.Repository.FlashcardRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -21,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -53,9 +54,9 @@ class StudyServiceTest {
 
         List<FlashcardResponseDto> result = studyService.getDueFlashcards(deckId);
 
-        Assertions.assertThat(result).hasSize(2);
-        Assertions.assertThat(result.getFirst().front()).isEqualTo("Front");
-        Assertions.assertThat(result.get(1).back()).isEqualTo("Back 2");
+        assertThat(result).hasSize(2);
+        assertThat(result.getFirst().front()).isEqualTo("Front");
+        assertThat(result.get(1).back()).isEqualTo("Back 2");
 
         verify(flashcardMapper).toDtoList(flashcardList);
     }
@@ -73,9 +74,9 @@ class StudyServiceTest {
 
         Flashcard result = studyService.updateStudiedFlashcard(id, dto);
 
-        Assertions.assertThat(result.getBoxLevel()).isEqualTo(3);
-        Assertions.assertThat(result.getLastReviewDate()).isEqualTo(LocalDate.now());
-        Assertions.assertThat(result.getNextReviewDate()).isEqualTo(LocalDate.now().plusDays(4));
+        assertThat(result.getBoxLevel()).isEqualTo(3);
+        assertThat(result.getLastReviewDate()).isEqualTo(LocalDate.now());
+        assertThat(result.getNextReviewDate()).isEqualTo(LocalDate.now().plusDays(4));
 
         verify(flashcardRepository).save(result);
     }
@@ -93,9 +94,9 @@ class StudyServiceTest {
 
         Flashcard result = studyService.updateStudiedFlashcard(id, dto);
 
-        Assertions.assertThat(result.getBoxLevel()).isEqualTo(1);
-        Assertions.assertThat(result.getLastReviewDate()).isEqualTo(LocalDate.now());
-        Assertions.assertThat(result.getNextReviewDate()).isEqualTo(LocalDate.now().plusDays(1));
+        assertThat(result.getBoxLevel()).isEqualTo(1);
+        assertThat(result.getLastReviewDate()).isEqualTo(LocalDate.now());
+        assertThat(result.getNextReviewDate()).isEqualTo(LocalDate.now().plusDays(1));
 
         verify(flashcardRepository).save(result);
     }
@@ -106,7 +107,7 @@ class StudyServiceTest {
 
         when(flashcardRepository.findById(id)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> studyService.updateStudiedFlashcard(id, new RememberDto(true)))
+        assertThatThrownBy(() -> studyService.updateStudiedFlashcard(id, new RememberDto(true)))
                         .isInstanceOf(NotFoundException.class)
                         .hasMessageContaining("Flashcard not found");
 
@@ -127,7 +128,7 @@ class StudyServiceTest {
 
         Long result = studyService.countTotalPerDeck(deckId);
 
-        Assertions.assertThat(result).isEqualTo(3L);
+        assertThat(result).isEqualTo(3L);
     }
 
     @Test
@@ -136,7 +137,7 @@ class StudyServiceTest {
 
         when(deckRepository.existsById(deckId)).thenReturn(false);
 
-        Assertions.assertThatThrownBy(()-> studyService.countTotalPerDeck(deckId))
+        assertThatThrownBy(()-> studyService.countTotalPerDeck(deckId))
                 .hasMessageContaining("Deck not found.")
                 .isInstanceOf(NotFoundException.class);
     }
@@ -159,6 +160,6 @@ class StudyServiceTest {
 
         Long result = studyService.countTotalDuePerDeck(deckId, defaultDate);
 
-        Assertions.assertThat(result).isEqualTo(2L);
+        assertThat(result).isEqualTo(2L);
     }
 }
