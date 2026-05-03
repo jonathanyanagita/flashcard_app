@@ -45,6 +45,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Token Error", ex.getMessage());
     }
 
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<ErrorResponseDto> handleWrongToken(EmailException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Email Sending Error.", ex.getMessage());
+    }
+
     @ExceptionHandler(FlashcardRememberException.class)
     public ResponseEntity<ErrorResponseDto> handleFlashcardRemember() {
         return buildResponse(HttpStatus.BAD_REQUEST, "Missing parameter.",

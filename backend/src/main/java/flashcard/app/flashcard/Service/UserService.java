@@ -6,6 +6,7 @@ import flashcard.app.flashcard.Dto.UserDtos.ResendEmailDto;
 import flashcard.app.flashcard.Dto.UserDtos.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.DuplicateException;
+import flashcard.app.flashcard.Exception.EmailException;
 import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Exception.WrongTokenException;
 import flashcard.app.flashcard.Repository.UserRepository;
@@ -26,13 +27,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
-    private final TokenService tokenService;
 
-    public UserService(UserRepository userRepository,  PasswordEncoder passwordEncoder, EmailService emailService, TokenService tokenService) {
+    public UserService(UserRepository userRepository,  PasswordEncoder passwordEncoder, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
-        this.tokenService = tokenService;
     }
 
     @Transactional
@@ -53,7 +52,7 @@ public class UserService {
         try {
             emailService.sendEmail(userCreateDto.email(), content.subject(), content.body());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending email.");
+            throw new EmailException("Error sending email.");
         }
 
         userRepository.save(newUser);
@@ -76,7 +75,7 @@ public class UserService {
         try {
             emailService.sendEmail(user.getEmail(), content.subject(), content.body());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending email.");
+            throw new EmailException("Error sending email.");
         }
     }
 
@@ -120,7 +119,7 @@ public class UserService {
         try {
             emailService.sendEmail(email, content.subject(), content.body());
         } catch (Exception e) {
-            throw new RuntimeException("Error sending email.");
+            throw new EmailException("Error sending email.");
         }
 
     }
