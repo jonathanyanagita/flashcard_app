@@ -2,6 +2,8 @@ package flashcard.app.flashcard.Service;
 
 import flashcard.app.flashcard.Dto.UserDtos.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
+import flashcard.app.flashcard.Exception.DuplicateException;
+import flashcard.app.flashcard.Exception.EmailException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -38,5 +41,33 @@ public class UserServiceTest {
 
         verify(emailService).sendEmail(eq(userCreateDto.email()), any(), any());
         verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void registerUser_whenEmailServiceThrowsException_shouldNotSaveUser() {
+        UserCreateDto userCreateDto = new UserCreateDto("email@email.com","password");
+        when(passwordEncoder.encode(any())).thenReturn("encryptedPassword");
+        when(userRepository.existsByEmail(any())).thenReturn(false);
+        doThrow(new EmailException("SMTP error")).when(emailService)
+                .sendEmail(anyString(), anyString(), anyString());
+
+        assertThatThrownBy(()-> userService.registerUser(userCreateDto))
+                        .isInstanceOf(EmailException.class)
+                                .hasMessageContaining("Error sending email.");
+
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void registerUser_whenEmailAlreadyExists_shouldNotSaveUser() {
+        UserCreateDto userCreateDto = new UserCreateDto("email@email.com","password");
+        when(passwordEncoder.encode(any())).thenReturn("encryptedPassword");
+        when(userRepository.existsByEmail(any())).thenReturn(true);
+
+        assertThatThrownBy(()-> userService.registerUser(userCreateDto))
+                        .isInstanceOf(DuplicateException.class)
+                                .hasMessageContaining("User with this email already exists.");
+
+        verify(userRepository, never()).save(any(User.class));
     }
 }
