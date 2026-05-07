@@ -70,4 +70,18 @@ public class UserServiceTest {
 
         verify(userRepository, never()).save(any(User.class));
     }
+
+    @Test
+    void registerUser_beforeSaving_shouldSetConfirmationToken() {
+        UserCreateDto userCreateDto = new UserCreateDto("email@email.com","password");
+        when(passwordEncoder.encode(any())).thenReturn("encryptedPassword");
+        when(userRepository.existsByEmail(any())).thenReturn(false);
+
+        userService.registerUser(userCreateDto);
+
+        verify(userRepository).save(argThat(user ->
+                user.getTokenConfirmation() != null && user.getTokenConfirmation().matches("\\d{6}")));
+    }
+
+
 }
