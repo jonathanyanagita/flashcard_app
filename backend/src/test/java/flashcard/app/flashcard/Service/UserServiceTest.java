@@ -83,5 +83,15 @@ public class UserServiceTest {
                 user.getTokenConfirmation() != null && user.getTokenConfirmation().matches("\\d{6}")));
     }
 
+    @Test
+    void registerUser_shouldSaveUserWithEncryptedPassword() {
+        UserCreateDto userCreateDto = new UserCreateDto("email@email.com","password");
+        when(passwordEncoder.encode("password")).thenReturn("encryptedPassword");
+        when(userRepository.existsByEmail(any())).thenReturn(false);
 
+        userService.registerUser(userCreateDto);
+
+        verify(userRepository).save(argThat(user -> "encryptedPassword".equals(user.getPassword())
+        ));
+    }
 }
