@@ -1,5 +1,6 @@
 package flashcard.app.flashcard.Service;
 
+import flashcard.app.flashcard.Dto.UserDtos.ResendEmailDto;
 import flashcard.app.flashcard.Dto.UserDtos.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.DuplicateException;
@@ -11,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -93,5 +96,16 @@ public class UserServiceTest {
 
         verify(userRepository).save(argThat(user -> "encryptedPassword".equals(user.getPassword())
         ));
+    }
+
+    @Test
+    void resendEmail_whenUserExists_shouldUpdateTokenAndSendEmail() {
+        User user = new User("test@email.com", "encryptedPassword");
+        ResendEmailDto resendEmailDto = new ResendEmailDto("test@email.com");
+        when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.of(user));
+
+        userService.resendEmail(resendEmailDto);
+
+        verify(emailService).sendEmail(eq("test@email.com"), anyString(), anyString());
     }
 }
