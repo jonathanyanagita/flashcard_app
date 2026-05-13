@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -107,5 +108,16 @@ public class UserServiceTest {
         userService.resendEmail(resendEmailDto);
 
         verify(emailService).sendEmail(eq("test@email.com"), anyString(), anyString());
+    }
+
+    @Test
+    void resendEmail_beforeSendingEmail_shouldSetValid6DigitToken() {
+        User user = new User("test@email.com", "encryptedPassword");
+        ResendEmailDto resendEmailDto = new ResendEmailDto("test@email.com");
+        when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.of(user));
+
+        userService.resendEmail(resendEmailDto);
+
+        assertThat(user.getTokenConfirmation()).isNotNull().matches("\\d{6}");
     }
 }
