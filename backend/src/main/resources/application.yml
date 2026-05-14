@@ -14,5 +14,6 @@ spring:
     show-sql: true
 
 springdoc:
-  swagger-ui:
-    path: /swagger
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
