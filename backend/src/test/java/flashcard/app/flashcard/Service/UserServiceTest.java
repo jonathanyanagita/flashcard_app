@@ -5,6 +5,7 @@ import flashcard.app.flashcard.Dto.UserDtos.UserCreateDto;
 import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.DuplicateException;
 import flashcard.app.flashcard.Exception.EmailException;
+import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -119,5 +120,18 @@ public class UserServiceTest {
         userService.resendEmail(resendEmailDto);
 
         assertThat(user.getTokenConfirmation()).isNotNull().matches("\\d{6}");
+    }
+
+    @Test
+    void resendEmail_whenEmailNotFound_shouldThrowNotFoundException() {
+        User user = new User("test@email.com", "encryptedPassword");
+        ResendEmailDto resendEmailDto = new ResendEmailDto("test@email.com");
+        when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.resendEmail(resendEmailDto))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessageContaining("Email not found on database.");
+
+        verify(emailService, never()).sendEmail(anyString(), anyString(), anyString());
     }
 }
