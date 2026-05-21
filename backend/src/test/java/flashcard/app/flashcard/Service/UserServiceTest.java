@@ -134,4 +134,29 @@ public class UserServiceTest {
 
         verify(emailService, never()).sendEmail(anyString(), anyString(), anyString());
     }
+
+    @Test
+    void resendEmail_whenEmailServiceFails_shouldThrowEmailException() {
+        User user = new User("test@email.com", "encryptedPassword");
+        ResendEmailDto resendEmailDto = new ResendEmailDto("test@email.com");
+        when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.of(user));
+        doThrow(new RuntimeException("SMTP error"))
+                .when(emailService).sendEmail(anyString(), anyString(), anyString());
+
+        assertThatThrownBy(() -> userService.resendEmail(resendEmailDto))
+                .isInstanceOf(EmailException.class)
+                        .hasMessageContaining("Error sending email.");
+    }
+
+    @Test
+    void resendEmail_shouldOverwritePreviousToken() {
+        User user = new User("test@email.com", "encryptedPassword");
+        ResendEmailDto resendEmailDto = new ResendEmailDto("test@email.com");
+        user.setTokenConfirmation("000000");
+        when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.of(user));
+
+        userService.resendEmail(resendEmailDto);
+
+        assertThat(user.getTokenConfirmation()).isNotEqualTo("000000");
+    }
 }

@@ -1,6 +1,9 @@
 spring:
   application:
     name: flashcard_app
+  output:
+    ansi:
+      enabled: ALWAYS
 
   datasource:
     url: ${DB_URL}
