@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -158,5 +159,26 @@ public class UserServiceTest {
         userService.resendEmail(resendEmailDto);
 
         assertThat(user.getTokenConfirmation()).isNotEqualTo("000000");
+    }
+
+    @Test
+    void getUserById_whenIdExists_shouldReturnUser() {
+        UUID userId = UUID.randomUUID();
+        User user = new User("test@email.com", "encryptedPassword");
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+
+        Optional<User> result = userService.getUserById(userId);
+
+        assertThat(result).isPresent().contains(user);
+    }
+
+    @Test
+    void getUserById_whenIdNotFound_shouldReturnEmpty() {
+        UUID userId = UUID.randomUUID();
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        Optional<User> result = userService.getUserById(userId);
+
+        assertThat(result).isEmpty();
     }
 }
