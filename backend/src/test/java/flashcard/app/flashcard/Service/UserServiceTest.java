@@ -181,4 +181,14 @@ public class UserServiceTest {
 
         assertThat(result).isEmpty();
     }
+
+    @Test
+    void forgotPassword_whenUserExists_shouldSetTokenAndSendEmail() {
+        User user = new User("test@email.com", "encryptedPassword");
+        when(userRepository.findByEmail("test@email.com")).thenReturn(Optional.of(user));
+
+        userService.forgotPassword("test@email.com");
+
+        verify(emailService).sendEmail(eq("test@email.com"), anyString(), anyString());
+    }
 }
