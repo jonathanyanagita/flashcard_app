@@ -9,11 +9,13 @@ import flashcard.app.flashcard.Exception.NotFoundException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -189,6 +191,13 @@ public class UserServiceTest {
 
         userService.forgotPassword("test@email.com");
 
-        verify(emailService).sendEmail(eq("test@email.com"), anyString(), anyString());
+        assertThat(user.getTokenRecPassword()).isNotNull();
+        assertThat(user.getTokenRecPassword()).hasSize(6);
+        assertThat(user.getTokenRecPasswordValidity()).isAfter(LocalDateTime.now());
+
+        ArgumentCaptor<String> bodyCaptor = ArgumentCaptor.forClass(String.class);
+        verify(emailService).sendEmail(eq("test@email.com"), anyString(), bodyCaptor.capture());
+
+        assertThat(bodyCaptor.getValue()).contains(user.getTokenRecPassword());
     }
 }
