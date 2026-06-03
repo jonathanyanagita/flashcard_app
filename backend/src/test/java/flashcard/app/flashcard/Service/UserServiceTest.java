@@ -200,4 +200,16 @@ public class UserServiceTest {
 
         assertThat(bodyCaptor.getValue()).contains(user.getTokenRecPassword());
     }
+
+    @Test
+    void forgotPassword_WhenUserDoesNotExist_ShouldThrowNotFoundException() {
+        User user = new User("test@email.com", "encryptedPassword");
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.forgotPassword(user.getUsername()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Email not found on database.");
+
+        verifyNoInteractions(emailService);
+    }
 }
