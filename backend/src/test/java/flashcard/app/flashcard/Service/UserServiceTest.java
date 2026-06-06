@@ -212,4 +212,17 @@ public class UserServiceTest {
 
         verifyNoInteractions(emailService);
     }
+
+    @Test
+    void forgotPassword_WhenEmailSendingFails_ShouldThrowEmailException() throws Exception {
+        User user = new User("test@email.com", "encryptedPassword");
+
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+
+        doThrow(new EmailException("Error sending email.")).when(emailService).sendEmail(anyString(), anyString(), anyString());
+
+        assertThatThrownBy(() -> userService.forgotPassword(user.getEmail()))
+                .isInstanceOf(EmailException.class)
+                .hasMessageContaining("Error sending email.");
+    }
 }
