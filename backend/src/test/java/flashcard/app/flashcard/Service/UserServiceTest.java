@@ -225,4 +225,23 @@ public class UserServiceTest {
                 .isInstanceOf(EmailException.class)
                 .hasMessageContaining("Error sending email.");
     }
+
+    @Test
+    void confirmEmail_WhenTokenIsValid_ShouldActivateUserClearTokenAndReturnUser() {
+        String validToken = "valid-confirmation-token";
+        User user = new User();
+        user.setActive(false);
+        user.setTokenConfirmation(validToken);
+
+        when(userRepository.findByTokenConfirmation(validToken)).thenReturn(user);
+        when(userRepository.save(user)).thenReturn(user);
+
+        Optional<User> result = userService.confirmEmail(validToken);
+
+        assertThat(result).isPresent().contains(user);
+        assertThat(user.isActive()).isTrue();
+        assertThat(user.getTokenConfirmation()).isNull();
+
+        verify(userRepository).save(user);
+    }
 }
