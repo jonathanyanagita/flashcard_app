@@ -6,6 +6,7 @@ import flashcard.app.flashcard.Entity.User;
 import flashcard.app.flashcard.Exception.DuplicateException;
 import flashcard.app.flashcard.Exception.EmailException;
 import flashcard.app.flashcard.Exception.NotFoundException;
+import flashcard.app.flashcard.Exception.WrongTokenException;
 import flashcard.app.flashcard.Repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -243,5 +244,17 @@ public class UserServiceTest {
         assertThat(user.getTokenConfirmation()).isNull();
 
         verify(userRepository).save(user);
+    }
+
+    @Test
+    void confirmEmail_WhenTokenDoesNotExist_ShouldThrowWrongTokenException() {
+        String invalidToken = "invalid-or-expired-token";
+        when(userRepository.findByTokenConfirmation(invalidToken)).thenReturn(null);
+
+        assertThatThrownBy(() -> userService.confirmEmail(invalidToken))
+                .isInstanceOf(WrongTokenException.class)
+                .hasMessage("Invalid or expired token.");
+
+        verify(userRepository, never()).save(any(User.class));
     }
 }
